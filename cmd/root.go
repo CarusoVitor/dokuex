@@ -28,40 +28,22 @@ var matchCmd = &cobra.Command{
 		}
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		characteristicsMap := make(map[string]characteristics.Characteristic, cmd.Flags().NFlag())
+		nameToFlag := make(map[string]string, cmd.Flags().NFlag())
 		cmd.Flags().Visit(func(f *pflag.Flag) {
-			characteristicsMap[f.Name] = characteristics.NewCharacteristic(f.Name)
+			nameToFlag[f.Name] = cmd.Flag(f.Name).Value.String()
 		})
-		pokemons := make(map[string]struct{}, 0)
-		for flag, characteristic := range characteristicsMap {
-			value := cmd.Flag(flag).Value.String()
-			result, err := characteristic.Get(value)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "Error getting characteristic %s: %v\n. The match will proceed ignoring it", flag, err)
-			}
-			if len(result) == 0 {
-				fmt.Printf("No pokemons found for characteristic %s with value %s\n", flag, value)
-				break
-			}
-			if len(pokemons) == 0 {
-				pokemons = make(map[string]struct{}, len(result))
-				for name := range result {
-					pokemons[name] = struct{}{}
-				}
-			} else {
-				pokemons = intersect(pokemons, result)
-				if len(pokemons) == 0 {
-					fmt.Println("No pokemons found matching all characteristics")
-					break
-				}
-			}
+		pokemons, err := characteristics.MatchAll(nameToFlag)
+		if err != nil {
+			fmt.Fprint(os.Stderr, err)
+			os.Exit(1)
+		}
+		fmt.Println("Pokemons found:")
+		i := 0
+		for pokemon := range pokemons {
+			i++
+			fmt.Printf("%d. %s\n", i, pokemon)
 		}
 	},
-}
-
-// TODO: implement set intersection
-func intersect(a, b map[string]struct{}) map[string]struct{} {
-	return a
 }
 
 func init() {
