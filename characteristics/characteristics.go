@@ -5,7 +5,7 @@ import (
 )
 
 type characteristic interface {
-	get(name string) (map[string]struct{}, error)
+	getPokemons(name string) (map[string]struct{}, error)
 }
 
 // TODO: implement factory pattern to return the correct characteristic based on the name
@@ -18,16 +18,16 @@ func intersect(a, b map[string]struct{}) map[string]struct{} {
 	return a
 }
 
-// MatchAll takes a map of characteristic names to their desired values and returns a set of pokemon names
+// MatchEmAll takes a map of characteristic names to their desired values and returns a set of pokemon names
 // that match all characteristics
-func MatchAll(nameToValue map[string]string) (map[string]struct{}, error) {
+func MatchEmAll(nameToValue map[string]string) (map[string]struct{}, error) {
 	pokemons := make(map[string]struct{}, 0)
 	for name, value := range nameToValue {
 		characteristic, err := newCharacteristic(name)
 		if err != nil {
 			return nil, fmt.Errorf("error creating characteristic %s: %v", name, err)
 		}
-		result, err := characteristic.get(value)
+		result, err := characteristic.getPokemons(value)
 		if err != nil {
 			return nil, fmt.Errorf("error getting characteristic %s: %v", name, err)
 		}

@@ -32,7 +32,7 @@ var matchCmd = &cobra.Command{
 		cmd.Flags().Visit(func(f *pflag.Flag) {
 			nameToFlag[f.Name] = cmd.Flag(f.Name).Value.String()
 		})
-		pokemons, err := characteristics.MatchAll(nameToFlag)
+		pokemons, err := characteristics.MatchEmAll(nameToFlag)
 		if err != nil {
 			fmt.Fprint(os.Stderr, err)
 			os.Exit(1)
