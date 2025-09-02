@@ -1,0 +1,71 @@
+package pokeapi
+
+import (
+	"fmt"
+	"io"
+	"net/http"
+	"time"
+)
+
+const pokeapiUrl string = "https://pokeapi.co/api/v2"
+const clientTimeout time.Duration = time.Second * 60
+
+type PokeClient interface {
+	FetchPokemons(characteristic, value string) ([]byte, error)
+}
+
+func NewPokeClient() PokeClient {
+	cache := newCache()
+	client := http.Client{Timeout: clientTimeout}
+	return pokeapiClient{
+		client:  &client,
+		cache:   &cache,
+		baseUrl: pokeapiUrl,
+	}
+}
+
+type pokeapiClient struct {
+	client  *http.Client
+	cache   *cache
+	baseUrl string
+}
+
+type HttpError struct {
+	statusCode int
+	message    []byte
+}
+
+func (h HttpError) Error() string {
+	return fmt.Sprintf("[%d] - %s", h.statusCode, h.message)
+}
+
+func newHttpError(statusCode int, message []byte) HttpError {
+	return HttpError{statusCode: statusCode, message: message}
+}
+
+func (c pokeapiClient) formatUrl(characteristic, value string) string {
+	return fmt.Sprintf("%s/%s/%s", c.baseUrl, characteristic, value)
+}
+
+func (c pokeapiClient) FetchPokemons(characteristic, value string) ([]byte, error) {
+	url := c.formatUrl(characteristic, value)
+
+	if value, ok := c.cache.get(url); ok {
+		return value, nil
+	}
+	response, err := c.client.Get(url)
+	if err != nil {
+		return nil, err
+	}
+
+	defer response.Body.Close()
+	body, err := io.ReadAll(response.Body)
+
+	if err != nil {
+		return nil, err
+	}
+	if response.StatusCode != http.StatusOK {
+		return nil, newHttpError(response.StatusCode, body)
+	}
+	return body, nil
+}
