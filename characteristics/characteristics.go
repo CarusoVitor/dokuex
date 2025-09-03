@@ -1,43 +1,42 @@
 package characteristics
 
 import (
-	"fmt"
+	"encoding/json"
 
 	"github.com/CarusoVitor/dokuex/pokeapi"
 )
 
-type PokemonSet = map[string]struct{}
-
-// TODO: implement set intersection
-func intersect(a, b PokemonSet) PokemonSet {
-	return a
+type typeCharacteristic struct {
+	client pokeapi.PokeClient
 }
 
-// MatchEmAll takes a map of characteristic names to their desired values and returns a set of pokemon names
-// that match all characteristics
-func MatchEmAll(nameToValue map[string]string, client pokeapi.PokeClient) (PokemonSet, error) {
-	manager := newCharacteristicManager(client)
-	pokemons := make(PokemonSet, 0)
-	for name, value := range nameToValue {
-		char, err := manager.createCharacteristic(name)
-		if err != nil {
-			return nil, fmt.Errorf("error creating characteristic %s: %w", name, err)
-		}
-		result, err := char.getPokemons(value)
-		if len(result) == 0 {
-			return result, fmt.Errorf("error getting pokemons with characteristic %s: %w", name, err)
-		}
-		if len(pokemons) == 0 {
-			pokemons = make(PokemonSet, len(result))
-			for name := range result {
-				pokemons[name] = struct{}{}
-			}
-		} else {
-			pokemons = intersect(pokemons, result)
-			if len(pokemons) == 0 {
-				return pokemons, nil
-			}
-		}
+func newTypeCharacteristic(client pokeapi.PokeClient) typeCharacteristic {
+	return typeCharacteristic{client: client}
+}
+
+func (tc typeCharacteristic) getPokemons(value string) (PokemonSet, error) {
+	rawPokemons, err := tc.client.FetchPokemons(typeName, value)
+	if err != nil {
+		return nil, err
 	}
+	pokemons, err := tc.formatResponse(rawPokemons)
+	if err != nil {
+		return nil, err
+	}
+
 	return pokemons, nil
+}
+
+func (tc typeCharacteristic) formatResponse(values []byte) (PokemonSet, error) {
+	var typeResp pokeapi.TypeResponse
+	err := json.Unmarshal(values, &typeResp)
+	if err != nil {
+		panic("typeCharacteristic.formatResponse: unmarshaling must not produce an error here")
+	}
+
+	set := make(PokemonSet, len(typeResp.Pokemon))
+	for _, entry := range typeResp.Pokemon {
+		set[entry.Pokemon.Name] = struct{}{}
+	}
+	return set, nil
 }
