@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/CarusoVitor/dokuex/characteristics"
+	"github.com/CarusoVitor/dokuex/pokeapi"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
@@ -32,10 +33,16 @@ var matchCmd = &cobra.Command{
 		cmd.Flags().Visit(func(f *pflag.Flag) {
 			nameToFlag[f.Name] = cmd.Flag(f.Name).Value.String()
 		})
-		pokemons, err := characteristics.MatchEmAll(nameToFlag)
+
+		client := pokeapi.NewPokeClient()
+		pokemons, err := characteristics.MatchEmAll(nameToFlag, client)
+
 		if err != nil {
-			fmt.Fprint(os.Stderr, err)
-			os.Exit(1)
+			fmt.Fprintln(os.Stderr, err)
+		}
+		if len(pokemons) == 0 {
+			fmt.Println("No pokemons found matching the given characteristics")
+			return
 		}
 		fmt.Println("Pokemons found:")
 		i := 0

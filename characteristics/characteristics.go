@@ -2,40 +2,33 @@ package characteristics
 
 import (
 	"fmt"
+
+	"github.com/CarusoVitor/dokuex/pokeapi"
 )
 
-type characteristic interface {
-	getPokemons(name string) (map[string]struct{}, error)
-}
-
-// TODO: implement factory pattern to return the correct characteristic based on the name
-func newCharacteristic(name string) (characteristic, error) {
-	return nil, nil
-}
+type PokemonSet = map[string]struct{}
 
 // TODO: implement set intersection
-func intersect(a, b map[string]struct{}) map[string]struct{} {
+func intersect(a, b PokemonSet) PokemonSet {
 	return a
 }
 
 // MatchEmAll takes a map of characteristic names to their desired values and returns a set of pokemon names
 // that match all characteristics
-func MatchEmAll(nameToValue map[string]string) (map[string]struct{}, error) {
-	pokemons := make(map[string]struct{}, 0)
+func MatchEmAll(nameToValue map[string]string, client pokeapi.PokeClient) (PokemonSet, error) {
+	manager := newCharacteristicManager(client)
+	pokemons := make(PokemonSet, 0)
 	for name, value := range nameToValue {
-		characteristic, err := newCharacteristic(name)
+		char, err := manager.createCharacteristic(name)
 		if err != nil {
-			return nil, fmt.Errorf("error creating characteristic %s: %v", name, err)
+			return nil, fmt.Errorf("error creating characteristic %s: %w", name, err)
 		}
-		result, err := characteristic.getPokemons(value)
-		if err != nil {
-			return nil, fmt.Errorf("error getting characteristic %s: %v", name, err)
-		}
+		result, err := char.getPokemons(value)
 		if len(result) == 0 {
-			return result, nil
+			return result, fmt.Errorf("error getting pokemons with characteristic %s: %w", name, err)
 		}
 		if len(pokemons) == 0 {
-			pokemons = make(map[string]struct{}, len(result))
+			pokemons = make(PokemonSet, len(result))
 			for name := range result {
 				pokemons[name] = struct{}{}
 			}
