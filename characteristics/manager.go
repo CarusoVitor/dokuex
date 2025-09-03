@@ -9,6 +9,7 @@ import (
 const (
 	typeName       string = "type"
 	generationName string = "generation"
+	moveName       string = "move"
 )
 
 type invalidCharacteristicError struct {
@@ -41,6 +42,8 @@ func (cm characteristicManager) createCharacteristic(name string) (characteristi
 		return newTypeCharacteristic(cm.client), nil
 	case generationName:
 		return newGenerationCharacteristic(cm.client), nil
+	case moveName:
+		return newMoveCharacteristic(cm.client), nil
 	}
 	return nil, newInvalidCharacteristicsError(name)
 }

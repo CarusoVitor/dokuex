@@ -36,6 +36,14 @@ func newGenerationCharacteristic(client pokeapi.PokeClient) apiCharacteristic {
 	}
 }
 
+func newMoveCharacteristic(client pokeapi.PokeClient) apiCharacteristic {
+	return apiCharacteristic{
+		name:      moveName,
+		client:    client,
+		formatter: formatMoveResponse,
+	}
+}
+
 func formatTypeResponse(values []byte) (PokemonSet, error) {
 	var typeResp pokeapi.TypeResponse
 	if err := json.Unmarshal(values, &typeResp); err != nil {
@@ -55,6 +63,19 @@ func formatGenerationResponse(values []byte) (PokemonSet, error) {
 	}
 	set := make(PokemonSet, len(generationResp.PokemonSpecies))
 	for _, pokemon := range generationResp.PokemonSpecies {
+		set[pokemon.Name] = struct{}{}
+	}
+	return set, nil
+
+}
+
+func formatMoveResponse(values []byte) (PokemonSet, error) {
+	var moveResp pokeapi.MoveResponse
+	if err := json.Unmarshal(values, &moveResp); err != nil {
+		return nil, err
+	}
+	set := make(PokemonSet, len(moveResp.LearnedByPokemon))
+	for _, pokemon := range moveResp.LearnedByPokemon {
 		set[pokemon.Name] = struct{}{}
 	}
 	return set, nil

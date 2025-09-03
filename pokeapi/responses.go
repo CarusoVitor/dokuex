@@ -14,3 +14,10 @@ type GenerationResponse struct {
 		URL  string `json:"url"`
 	} `json:"pokemon_species"`
 }
+
+type MoveResponse struct {
+	LearnedByPokemon []struct {
+		Name string `json:"name"`
+		URL  string `json:"url"`
+	} `json:"learned_by_pokemon"`
+}

@@ -57,6 +57,7 @@ func init() {
 	// TODO: add more characteristics
 	matchCmd.Flags().String("type", "", "Type of the pokemon")
 	matchCmd.Flags().String("generation", "", "Generation of the pokemon in roman numerals")
+	matchCmd.Flags().String("move", "", "TM or HM in pokemon games")
 	rootCmd.AddCommand(matchCmd)
 }
 
