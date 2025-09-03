@@ -34,7 +34,7 @@ var matchCmd = &cobra.Command{
 			nameToFlag[f.Name] = cmd.Flag(f.Name).Value.String()
 		})
 
-		client := pokeapi.NewPokeClient()
+		client := pokeapi.NewPokeApiClient()
 		pokemons, err := characteristics.MatchEmAll(nameToFlag, client)
 
 		if err != nil {

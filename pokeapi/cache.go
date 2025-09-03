@@ -15,13 +15,13 @@ type cache struct {
 	mux     *sync.Mutex
 }
 
-func newCache() cache {
+func newCache() *cache {
 	c := cache{
 		entries: make(map[string]cacheEntry),
 		mux:     &sync.Mutex{},
 	}
 	go c.reapLoop(5 * time.Minute)
-	return c
+	return &c
 }
 
 func newCacheEntry(value []byte) cacheEntry {

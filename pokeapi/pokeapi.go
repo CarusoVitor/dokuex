@@ -14,17 +14,17 @@ type PokeClient interface {
 	FetchPokemons(characteristic, value string) ([]byte, error)
 }
 
-func NewPokeClient() PokeClient {
+func NewPokeApiClient() *pokeApiClient {
 	cache := newCache()
 	client := http.Client{Timeout: clientTimeout}
-	return pokeapiClient{
+	return &pokeApiClient{
 		client:  &client,
-		cache:   &cache,
+		cache:   cache,
 		baseUrl: pokeapiUrl,
 	}
 }
 
-type pokeapiClient struct {
+type pokeApiClient struct {
 	client  *http.Client
 	cache   *cache
 	baseUrl string
@@ -43,11 +43,11 @@ func newHttpError(statusCode int, message []byte) HttpError {
 	return HttpError{statusCode: statusCode, message: message}
 }
 
-func (c pokeapiClient) formatUrl(characteristic, value string) string {
+func (c pokeApiClient) formatUrl(characteristic, value string) string {
 	return fmt.Sprintf("%s/%s/%s", c.baseUrl, characteristic, value)
 }
 
-func (c pokeapiClient) FetchPokemons(characteristic, value string) ([]byte, error) {
+func (c pokeApiClient) FetchPokemons(characteristic, value string) ([]byte, error) {
 	url := c.formatUrl(characteristic, value)
 
 	if value, ok := c.cache.get(url); ok {

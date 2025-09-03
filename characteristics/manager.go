@@ -28,17 +28,17 @@ type characteristic interface {
 }
 
 type characteristicManager struct {
-	client *pokeapi.PokeClient
+	client pokeapi.PokeClient
 }
 
 func newCharacteristicManager(client pokeapi.PokeClient) characteristicManager {
-	return characteristicManager{client: &client}
+	return characteristicManager{client: client}
 }
 
 func (cm characteristicManager) createCharacteristic(name string) (characteristic, error) {
 	switch name {
 	case typeName:
-		return newTypeCharacteristic(*cm.client), nil
+		return newTypeCharacteristic(cm.client), nil
 	}
 	return nil, newInvalidCharacteristicsError(name)
 }
