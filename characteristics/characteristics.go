@@ -6,34 +6,33 @@ import (
 	"github.com/CarusoVitor/dokuex/pokeapi"
 )
 
-type typeCharacteristic struct {
-	client pokeapi.PokeClient
+type apiCharacteristic struct {
+	name      string
+	client    pokeapi.PokeClient
+	formatter func([]byte) (PokemonSet, error)
 }
 
-func newTypeCharacteristic(client pokeapi.PokeClient) typeCharacteristic {
-	return typeCharacteristic{client: client}
-}
-
-func (tc typeCharacteristic) getPokemons(value string) (PokemonSet, error) {
-	rawPokemons, err := tc.client.FetchPokemons(typeName, value)
+func (ac apiCharacteristic) getPokemons(value string) (PokemonSet, error) {
+	raw, err := ac.client.FetchPokemons(ac.name, value)
 	if err != nil {
 		return nil, err
 	}
-	pokemons, err := tc.formatResponse(rawPokemons)
-	if err != nil {
-		return nil, err
-	}
-
-	return pokemons, nil
+	return ac.formatter(raw)
 }
 
-func (tc typeCharacteristic) formatResponse(values []byte) (PokemonSet, error) {
+func newTypeCharacteristic(client pokeapi.PokeClient) apiCharacteristic {
+	return apiCharacteristic{
+		name:      typeName,
+		client:    client,
+		formatter: formatTypeResponse,
+	}
+}
+
+func formatTypeResponse(values []byte) (PokemonSet, error) {
 	var typeResp pokeapi.TypeResponse
-	err := json.Unmarshal(values, &typeResp)
-	if err != nil {
-		panic("typeCharacteristic.formatResponse: unmarshaling must not produce an error here")
+	if err := json.Unmarshal(values, &typeResp); err != nil {
+		return nil, err
 	}
-
 	set := make(PokemonSet, len(typeResp.Pokemon))
 	for _, entry := range typeResp.Pokemon {
 		set[entry.Pokemon.Name] = struct{}{}
