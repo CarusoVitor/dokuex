@@ -8,3 +8,9 @@ type TypeResponse struct {
 		} `json:"pokemon"`
 	} `json:"pokemon"`
 }
+type GenerationResponse struct {
+	PokemonSpecies []struct {
+		Name string `json:"name"`
+		URL  string `json:"url"`
+	} `json:"pokemon_species"`
+}

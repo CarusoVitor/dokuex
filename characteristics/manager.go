@@ -39,6 +39,8 @@ func (cm characteristicManager) createCharacteristic(name string) (characteristi
 	switch name {
 	case typeName:
 		return newTypeCharacteristic(cm.client), nil
+	case generationName:
+		return newGenerationCharacteristic(cm.client), nil
 	}
 	return nil, newInvalidCharacteristicsError(name)
 }
