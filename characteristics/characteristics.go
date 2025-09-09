@@ -6,13 +6,15 @@ import (
 	"github.com/CarusoVitor/dokuex/pokeapi"
 )
 
-type apiCharacteristic struct {
+// endpointCharacteristic are the ones that query the api directly as
+// /characteristic_name/{characteristic}
+type endpointCharacteristic struct {
 	name      string
 	client    pokeapi.PokeClient
 	formatter func([]byte) (PokemonSet, error)
 }
 
-func (ac apiCharacteristic) getPokemons(value string) (PokemonSet, error) {
+func (ac endpointCharacteristic) getPokemons(value string) (PokemonSet, error) {
 	raw, err := ac.client.FetchPokemons(ac.name, value)
 	if err != nil {
 		return nil, err
@@ -20,32 +22,32 @@ func (ac apiCharacteristic) getPokemons(value string) (PokemonSet, error) {
 	return ac.formatter(raw)
 }
 
-func newTypeCharacteristic(client pokeapi.PokeClient) apiCharacteristic {
-	return apiCharacteristic{
+func newTypeCharacteristic(client pokeapi.PokeClient) endpointCharacteristic {
+	return endpointCharacteristic{
 		name:      typeName,
 		client:    client,
 		formatter: formatTypeResponse,
 	}
 }
 
-func newGenerationCharacteristic(client pokeapi.PokeClient) apiCharacteristic {
-	return apiCharacteristic{
+func newGenerationCharacteristic(client pokeapi.PokeClient) endpointCharacteristic {
+	return endpointCharacteristic{
 		name:      generationName,
 		client:    client,
 		formatter: formatGenerationResponse,
 	}
 }
 
-func newMoveCharacteristic(client pokeapi.PokeClient) apiCharacteristic {
-	return apiCharacteristic{
+func newMoveCharacteristic(client pokeapi.PokeClient) endpointCharacteristic {
+	return endpointCharacteristic{
 		name:      moveName,
 		client:    client,
 		formatter: formatMoveResponse,
 	}
 }
 
-func newAbilityCharacteristic(client pokeapi.PokeClient) apiCharacteristic {
-	return apiCharacteristic{
+func newAbilityCharacteristic(client pokeapi.PokeClient) endpointCharacteristic {
+	return endpointCharacteristic{
 		name:      abilityName,
 		client:    client,
 		formatter: formatAbilityResponse,
