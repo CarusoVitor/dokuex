@@ -1,0 +1,160 @@
+package characteristics
+
+import (
+	"reflect"
+	"testing"
+
+	"github.com/CarusoVitor/dokuex/pokeapi"
+)
+
+func Test_intersectSets(t *testing.T) {
+	type args struct {
+		smaller PokemonSet
+		bigger  PokemonSet
+	}
+	tests := []struct {
+		name string
+		args args
+		want PokemonSet
+	}{
+		{
+			name: "sets fully intersect",
+			args: args{
+				smaller: PokemonSet{
+					"x": struct{}{},
+					"y": struct{}{},
+				},
+				bigger: PokemonSet{
+					"x": struct{}{},
+					"y": struct{}{},
+				},
+			},
+			want: PokemonSet{
+				"x": struct{}{},
+				"y": struct{}{},
+			},
+		},
+		{
+			name: "sets do not intersect",
+			args: args{
+				smaller: PokemonSet{
+					"z": struct{}{},
+					"a": struct{}{},
+				},
+				bigger: PokemonSet{
+					"x": struct{}{},
+					"y": struct{}{},
+				},
+			},
+			want: PokemonSet{},
+		},
+		{
+			name: "sets partially intersect",
+			args: args{
+				smaller: PokemonSet{
+					"x": struct{}{},
+				},
+				bigger: PokemonSet{
+					"x": struct{}{},
+					"y": struct{}{},
+				},
+			},
+			want: PokemonSet{"x": struct{}{}},
+		},
+		{
+			name: "smaller set is empty",
+			args: args{
+				smaller: PokemonSet{},
+				bigger: PokemonSet{
+					"x": struct{}{},
+					"y": struct{}{},
+				},
+			},
+			want: PokemonSet{},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := intersectSets(tt.args.smaller, tt.args.bigger); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("intersectSets() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_intersectSetsBiggerSmallerSwapped(t *testing.T) {
+	smaller := PokemonSet{}
+	bigger := PokemonSet{
+		"x": struct{}{},
+		"y": struct{}{},
+	}
+
+	defer func() {
+		if r := recover(); r == nil {
+			t.Errorf("The code did not panic")
+		}
+	}()
+	_ = intersectSets(bigger, smaller)
+}
+
+func TestMatchEmAll(t *testing.T) {
+	client := endpointClientOneValue{}
+	type args struct {
+		nameToValue map[string]string
+		client      pokeapi.PokeClient
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    PokemonSet
+		wantErr bool
+	}{
+		{
+			name: "one characteristic only",
+			args: args{
+				nameToValue: map[string]string{
+					"type": client.typeValue(),
+				},
+				client: client,
+			},
+			want: client.typePokemons(),
+		},
+		{
+			name: "two characteristics that match",
+			args: args{
+				nameToValue: map[string]string{
+					"generation": client.generationValue(),
+					"move":       client.moveValue(),
+				},
+				client: client,
+			},
+			want: PokemonSet{
+				"ivysaur":  struct{}{},
+				"venusaur": struct{}{},
+			},
+		},
+		{
+			name: "two characteristics that don't match",
+			args: args{
+				nameToValue: map[string]string{
+					"ability": client.abilityValue(),
+					"move":    client.moveValue(),
+				},
+				client: client,
+			},
+			want: PokemonSet{},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := MatchEmAll(tt.args.nameToValue, tt.args.client)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("MatchEmAll() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("MatchEmAll() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
