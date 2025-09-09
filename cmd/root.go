@@ -18,6 +18,7 @@ var rootCmd = &cobra.Command{
 	},
 }
 
+// TODO: allow multiple runs to have an actual cache usage
 var matchCmd = &cobra.Command{
 	Use:   "match",
 	Short: "Match pokedoku characteristics",
@@ -54,10 +55,10 @@ var matchCmd = &cobra.Command{
 }
 
 func init() {
-	// TODO: add more characteristics
 	matchCmd.Flags().String("type", "", "Type of the pokemon")
 	matchCmd.Flags().String("generation", "", "Generation of the pokemon in roman numerals")
 	matchCmd.Flags().String("move", "", "TM or HM in pokemon games")
+	matchCmd.Flags().String("ability", "", "Ability of the pokemon (including hidden)")
 	rootCmd.AddCommand(matchCmd)
 }
 

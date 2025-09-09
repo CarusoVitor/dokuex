@@ -11,13 +11,19 @@ type TypeResponse struct {
 type GenerationResponse struct {
 	PokemonSpecies []struct {
 		Name string `json:"name"`
-		URL  string `json:"url"`
 	} `json:"pokemon_species"`
 }
 
 type MoveResponse struct {
 	LearnedByPokemon []struct {
 		Name string `json:"name"`
-		URL  string `json:"url"`
 	} `json:"learned_by_pokemon"`
+}
+
+type AbilityResponse struct {
+	Pokemon []struct {
+		Pokemon struct {
+			Name string `json:"name"`
+		} `json:"pokemon"`
+	} `json:"pokemon"`
 }

@@ -44,6 +44,14 @@ func newMoveCharacteristic(client pokeapi.PokeClient) apiCharacteristic {
 	}
 }
 
+func newAbilityCharacteristic(client pokeapi.PokeClient) apiCharacteristic {
+	return apiCharacteristic{
+		name:      abilityName,
+		client:    client,
+		formatter: formatAbilityResponse,
+	}
+}
+
 func formatTypeResponse(values []byte) (PokemonSet, error) {
 	var typeResp pokeapi.TypeResponse
 	if err := json.Unmarshal(values, &typeResp); err != nil {
@@ -77,6 +85,19 @@ func formatMoveResponse(values []byte) (PokemonSet, error) {
 	set := make(PokemonSet, len(moveResp.LearnedByPokemon))
 	for _, pokemon := range moveResp.LearnedByPokemon {
 		set[pokemon.Name] = struct{}{}
+	}
+	return set, nil
+
+}
+
+func formatAbilityResponse(values []byte) (PokemonSet, error) {
+	var abilityResp pokeapi.AbilityResponse
+	if err := json.Unmarshal(values, &abilityResp); err != nil {
+		return nil, err
+	}
+	set := make(PokemonSet, len(abilityResp.Pokemon))
+	for _, pokemon := range abilityResp.Pokemon {
+		set[pokemon.Pokemon.Name] = struct{}{}
 	}
 	return set, nil
 
