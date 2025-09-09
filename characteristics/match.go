@@ -30,8 +30,8 @@ func intersectSets(smaller, bigger PokemonSet) PokemonSet {
 
 // MatchEmAll takes a map of characteristic names to their desired values and returns a set of pokemon names
 // that match all characteristics
-func MatchEmAll(nameToValue map[string]string, client pokeapi.PokeClient) (PokemonSet, error) {
-	manager := newCharacteristicManager(client)
+func MatchEmAll(nameToValue map[string]string, pokeApiClient pokeapi.PokeClient) (PokemonSet, error) {
+	manager := newCharacteristicManager(pokeApiClient)
 	pokemons := make(PokemonSet, 0)
 	for name, value := range nameToValue {
 		char, err := manager.createCharacteristic(name)
