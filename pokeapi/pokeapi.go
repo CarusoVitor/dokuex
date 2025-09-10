@@ -3,6 +3,7 @@ package pokeapi
 import (
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"time"
 )
@@ -49,8 +50,10 @@ func (c pokeApiClient) formatUrl(characteristic, value string) string {
 
 func (c pokeApiClient) FetchPokemons(characteristic, value string) ([]byte, error) {
 	url := c.formatUrl(characteristic, value)
+	slog.Debug("called", "url", url)
 
 	if value, ok := c.cache.get(url); ok {
+		slog.Debug("url was cached")
 		return value, nil
 	}
 	response, err := c.client.Get(url)
