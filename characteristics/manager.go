@@ -11,6 +11,7 @@ const (
 	generationName string = "generation"
 	moveName       string = "move"
 	abilityName    string = "ability"
+	ultraBeastName string = "ultra-beast"
 )
 
 type invalidCharacteristicError struct {
@@ -47,6 +48,8 @@ func (cm characteristicManager) createCharacteristic(name string) (characteristi
 		return newMoveCharacteristic(cm.client), nil
 	case abilityName:
 		return newAbilityCharacteristic(cm.client), nil
+	case ultraBeastName:
+		return newUltraBeastCharacteristic(cm.client), nil
 	}
 	return nil, newInvalidCharacteristicsError(name)
 }

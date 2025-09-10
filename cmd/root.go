@@ -59,6 +59,7 @@ func init() {
 	matchCmd.Flags().String("generation", "", "Generation of the pokemon in the form generation-Z, where Z is a roman numeral from 1 to 9")
 	matchCmd.Flags().String("move", "", "TM or HM in pokemon games")
 	matchCmd.Flags().String("ability", "", "Ability of the pokemon (including hidden)")
+	matchCmd.Flags().Bool("ultra-beast", true, "Ultra beast pokemons")
 	rootCmd.AddCommand(matchCmd)
 }
 

@@ -1,77 +1,162 @@
 package characteristics
 
 import (
+	"fmt"
 	"reflect"
+	"strings"
 	"testing"
 )
 
 type endpointClientOneValue struct{}
 
-const (
-	testTypeValue       string = "grass"
-	testGenerationValue string = "generation-I"
-	testMoveValue       string = "hydro-pump"
-	testAbilityValue    string = "beast-boost"
-)
+func (ec endpointClientOneValue) typePokemons() PokemonSet {
+	return PokemonSet{
+		"bulbasaur": struct{}{},
+		"ivysaur":   struct{}{},
+		"venusaur":  struct{}{},
+	}
+}
 
-func (d endpointClientOneValue) FetchPokemons(characteristic, value string) ([]byte, error) {
-	if characteristic == typeName && value == testTypeValue {
-		return []byte(`{"pokemon":[{"pokemon":{"name":"bulbasaur"}},{"pokemon":{"name":"venusaur"}}]}`), nil
+func (ec endpointClientOneValue) generationPokemons() PokemonSet {
+	return PokemonSet{
+		"bulbasaur":  struct{}{},
+		"ivysaur":    struct{}{},
+		"venusaur":   struct{}{},
+		"charmander": struct{}{},
+		"charmeleon": struct{}{},
+		"charizard":  struct{}{},
+		"arcanine":   struct{}{},
 	}
-	if characteristic == generationName && value == testGenerationValue {
-		return []byte(`{"pokemon_species":[{"name":"growlithe"},{"name":"aerodactyl"}]}`), nil
+}
+
+func (ec endpointClientOneValue) movePokemons() PokemonSet {
+	return PokemonSet{
+		"ivysaur":  struct{}{},
+		"venusaur": struct{}{},
+		"togekiss": struct{}{},
 	}
-	if characteristic == moveName && value == testMoveValue {
-		return []byte(`{"learned_by_pokemon":[{"name":"blastoise"},{"name":"feraligatr"}]}`), nil
+}
+
+func (ec endpointClientOneValue) abilityPokemons() PokemonSet {
+	return PokemonSet{
+		"arcanine":  struct{}{},
+		"scraggy":   struct{}{},
+		"mightyena": struct{}{},
 	}
-	if characteristic == abilityName && value == testAbilityValue {
-		return []byte(`{"pokemon":[{"pokemon":{"name":"stakataka"}},{"pokemon":{"name":"kartana"}}]}`), nil
+}
+
+func (ec endpointClientOneValue) ultraBeastPokemons() PokemonSet {
+	return PokemonSet{
+		"kartana":  struct{}{},
+		"nihilego": struct{}{},
 	}
-	return nil, nil
+}
+
+func (ec endpointClientOneValue) typeValue() string {
+	return "grass"
+}
+
+func (ec endpointClientOneValue) generationValue() string {
+	return "generation-I"
+}
+func (ec endpointClientOneValue) moveValue() string {
+	return "solar-beam"
+}
+func (ec endpointClientOneValue) abilityValue() string {
+	return "intimidate"
+
+}
+
+func (ec endpointClientOneValue) FetchPokemons(characteristic, value string) ([]byte, error) {
+	var sb strings.Builder
+	i := 0
+	if characteristic == typeName && value == ec.typeValue() {
+		sb.WriteString(`{"pokemon":[`)
+		for p := range ec.typePokemons() {
+			sb.WriteString(fmt.Sprintf(`{"pokemon":{"name":"%s"}}`, p))
+			if i != len(ec.typePokemons())-1 {
+				sb.WriteString(",")
+			}
+			i++
+		}
+	}
+	if characteristic == generationName && value == ec.generationValue() {
+		sb.WriteString(`{"pokemon_species":[`)
+		for p := range ec.generationPokemons() {
+			sb.WriteString(fmt.Sprintf(`{"name":"%s"}`, p))
+			if i != len(ec.generationPokemons())-1 {
+				sb.WriteString(",")
+			}
+			i++
+		}
+	}
+	if characteristic == moveName && value == ec.moveValue() {
+		sb.WriteString(`{"learned_by_pokemon":[`)
+		for p := range ec.movePokemons() {
+			sb.WriteString(fmt.Sprintf(`{"name":"%s"}`, p))
+			if i != len(ec.movePokemons())-1 {
+				sb.WriteString(",")
+			}
+			i++
+		}
+	}
+	if (characteristic == abilityName && value == ec.abilityValue()) || (characteristic == ultraBeastName) {
+		var pokemons PokemonSet
+		if characteristic == abilityName {
+			pokemons = ec.abilityPokemons()
+		} else {
+			pokemons = ec.ultraBeastPokemons()
+		}
+		sb.WriteString(`{"pokemon":[`)
+		for p := range pokemons {
+			sb.WriteString(fmt.Sprintf(`{"pokemon":{"name":"%s"}}`, p))
+			if i != len(pokemons)-1 {
+				sb.WriteString(",")
+			}
+			i++
+		}
+	}
+	sb.WriteString("]}")
+	return []byte(sb.String()), nil
 }
 
 func Test_endpointCharacteristic_getPokemons(t *testing.T) {
+	client := endpointClientOneValue{}
 	tests := []struct {
 		name  string
 		value string
-		char  endpointCharacteristic
+		char  characteristic
 		want  PokemonSet
 	}{
 		{
 			name:  "get TypeCharacteristic response",
-			value: testTypeValue,
-			char:  newTypeCharacteristic(endpointClientOneValue{}),
-			want: PokemonSet{
-				"bulbasaur": struct{}{},
-				"venusaur":  struct{}{},
-			},
+			value: client.typeValue(),
+			char:  newTypeCharacteristic(client),
+			want:  client.typePokemons(),
 		},
 		{
 			name:  "get GenerationCharacteristic response",
-			value: testGenerationValue,
-			char:  newGenerationCharacteristic(endpointClientOneValue{}),
-			want: PokemonSet{
-				"growlithe":  struct{}{},
-				"aerodactyl": struct{}{},
-			},
+			value: client.generationValue(),
+			char:  newGenerationCharacteristic(client),
+			want:  client.generationPokemons(),
 		},
 		{
 			name:  "get MoveCharacteristic response",
-			value: testMoveValue,
-			char:  newMoveCharacteristic(endpointClientOneValue{}),
-			want: PokemonSet{
-				"blastoise":  struct{}{},
-				"feraligatr": struct{}{},
-			},
+			value: client.moveValue(),
+			char:  newMoveCharacteristic(client),
+			want:  client.movePokemons(),
 		},
 		{
 			name:  "get AbilityCharacteristic response",
-			value: testAbilityValue,
-			char:  newAbilityCharacteristic(endpointClientOneValue{}),
-			want: PokemonSet{
-				"stakataka": struct{}{},
-				"kartana":   struct{}{},
-			},
+			value: client.abilityValue(),
+			char:  newAbilityCharacteristic(client),
+			want:  client.abilityPokemons(),
+		},
+		{
+			name:  "get UltraBeastCharacteristic response",
+			value: "",
+			char:  newUltraBeastCharacteristic(client),
+			want:  client.ultraBeastPokemons(),
 		},
 	}
 
