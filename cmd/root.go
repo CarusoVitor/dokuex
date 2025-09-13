@@ -18,11 +18,12 @@ var rootCmd = &cobra.Command{
 	},
 }
 
-type cobraFlag struct {
+type characteristicFlag struct {
 	name  string
 	value any
 }
 
+// processFlagsValues formats active key-value flag pairs to a map
 func processFlagsValues(cmd *cobra.Command) (map[string][]string, error) {
 	nameToFlags := make(map[string][]string, cmd.Flags().NFlag())
 	var err error = nil
@@ -30,7 +31,9 @@ func processFlagsValues(cmd *cobra.Command) (map[string][]string, error) {
 	cmd.Flags().Visit(func(f *pflag.Flag) {
 		var values []string
 
-		switch f.Value.Type() {
+		flagType := f.Value.Type()
+
+		switch flagType {
 		case "string":
 			var value string
 			value, err = cmd.Flags().GetString(f.Name)
@@ -38,10 +41,10 @@ func processFlagsValues(cmd *cobra.Command) (map[string][]string, error) {
 		case "stringSlice":
 			values, err = cmd.Flags().GetStringSlice(f.Name)
 		case "bool":
-			var flag bool
-			flag, err = cmd.Flags().GetBool(f.Name)
+			values = []string{"true"}
+		default:
+			values, err = nil, fmt.Errorf("flag type %s wasn't yet implemented", flagType)
 		}
-
 		nameToFlags[f.Name] = values
 
 	})
@@ -60,10 +63,13 @@ var matchCmd = &cobra.Command{
 		}
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		nameToFlags := processFlagsValues(cmd)
+		nameToValues, err := processFlagsValues(cmd)
+		if err != nil {
+			panic(err)
+		}
 
 		client := pokeapi.NewPokeApiClient()
-		pokemons, err := characteristics.MatchEmAll(nameToFlag, client)
+		pokemons, err := characteristics.MatchEmAll(nameToValues, client)
 
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)

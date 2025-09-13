@@ -98,9 +98,16 @@ func Test_intersectSetsBiggerSmallerSwapped(t *testing.T) {
 }
 
 func TestMatchEmAll(t *testing.T) {
-	client := endpointClientOneValue{}
+	client := newDefaultEndpointClient()
+	client.typePokemons["poison"] = PokemonSet{
+		"bulbasaur": struct{}{},
+		"ivysaur":   struct{}{},
+		"venusaur":  struct{}{},
+		"koffing":   struct{}{},
+	}
+
 	type args struct {
-		nameToValue map[string]string
+		nameToValue map[string][]string
 		client      pokeapi.PokeClient
 	}
 	tests := []struct {
@@ -112,19 +119,33 @@ func TestMatchEmAll(t *testing.T) {
 		{
 			name: "one characteristic only",
 			args: args{
-				nameToValue: map[string]string{
-					"type": client.typeValue(),
+				nameToValue: map[string][]string{
+					"type": {"grass"},
 				},
 				client: client,
 			},
-			want: client.typePokemons(),
+			want: client.typePokemons["grass"],
+		},
+		{
+			name: "one characteristic multiple values",
+			args: args{
+				nameToValue: map[string][]string{
+					"type": {"grass", "poison"},
+				},
+				client: client,
+			},
+			want: PokemonSet{
+				"venusaur":  struct{}{},
+				"ivysaur":   struct{}{},
+				"bulbasaur": struct{}{},
+			},
 		},
 		{
 			name: "two characteristics that match",
 			args: args{
-				nameToValue: map[string]string{
-					"generation": client.generationValue(),
-					"move":       client.moveValue(),
+				nameToValue: map[string][]string{
+					"generation": {"generation-I"},
+					"move":       {"solar-beam"},
 				},
 				client: client,
 			},
@@ -136,9 +157,9 @@ func TestMatchEmAll(t *testing.T) {
 		{
 			name: "two characteristics that don't match",
 			args: args{
-				nameToValue: map[string]string{
-					"ability": client.abilityValue(),
-					"move":    client.moveValue(),
+				nameToValue: map[string][]string{
+					"ability": {"intimidate"},
+					"move":    {"solar-beam"},
 				},
 				client: client,
 			},

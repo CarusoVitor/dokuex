@@ -28,29 +28,34 @@ func intersectSets(smaller, bigger PokemonSet) PokemonSet {
 	return intersection
 }
 
-// MatchEmAll takes a map of characteristic names to their desired values and returns a set of pokemon names
-// that match all characteristics
-func MatchEmAll(nameToValue map[string]string, pokeApiClient pokeapi.PokeClient) (PokemonSet, error) {
+// MatchEmAll takes a map of characteristic names to their desired values
+// and returns a set of pokemon names that match all characteristics
+func MatchEmAll(
+	nameToValues map[string][]string,
+	pokeApiClient pokeapi.PokeClient,
+) (PokemonSet, error) {
 	manager := newCharacteristicManager(pokeApiClient)
 	pokemons := make(PokemonSet, 0)
-	for name, value := range nameToValue {
+	for name, values := range nameToValues {
 		char, err := manager.createCharacteristic(name)
 		if err != nil {
 			return nil, fmt.Errorf("error creating characteristic %s: %w", name, err)
 		}
-		result, err := char.getPokemons(value)
-		if len(result) == 0 {
-			return result, fmt.Errorf("error getting pokemons with characteristic %s: %w", name, err)
-		}
-		if len(pokemons) == 0 {
-			pokemons = make(PokemonSet, len(result))
-			for name := range result {
-				pokemons[name] = struct{}{}
+		for _, value := range values {
+			result, err := char.getPokemons(value)
+			if len(result) == 0 {
+				return result, fmt.Errorf("error getting pokemons with characteristic %s: %w", name, err)
 			}
-		} else {
-			pokemons = intersect(pokemons, result)
 			if len(pokemons) == 0 {
-				return pokemons, nil
+				pokemons = make(PokemonSet, len(result))
+				for name := range result {
+					pokemons[name] = struct{}{}
+				}
+			} else {
+				pokemons = intersect(pokemons, result)
+				if len(pokemons) == 0 {
+					return pokemons, nil
+				}
 			}
 		}
 	}
