@@ -50,7 +50,7 @@ func (c pokeApiClient) formatUrl(characteristic, value string) string {
 
 func (c pokeApiClient) FetchPokemons(characteristic, value string) ([]byte, error) {
 	url := c.formatUrl(characteristic, value)
-	slog.Debug("called", "url", url)
+	slog.Info("called", "url", url)
 
 	if value, ok := c.cache.get(url); ok {
 		slog.Debug("url was cached")

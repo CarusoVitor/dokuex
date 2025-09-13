@@ -6,7 +6,7 @@ import (
 	"github.com/CarusoVitor/dokuex/cmd"
 )
 
-const logLevel = slog.LevelInfo
+const logLevel = slog.LevelDebug
 
 func main() {
 	slog.SetLogLoggerLevel(logLevel)

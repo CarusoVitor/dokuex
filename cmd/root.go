@@ -18,6 +18,36 @@ var rootCmd = &cobra.Command{
 	},
 }
 
+type cobraFlag struct {
+	name  string
+	value any
+}
+
+func processFlagsValues(cmd *cobra.Command) (map[string][]string, error) {
+	nameToFlags := make(map[string][]string, cmd.Flags().NFlag())
+	var err error = nil
+
+	cmd.Flags().Visit(func(f *pflag.Flag) {
+		var values []string
+
+		switch f.Value.Type() {
+		case "string":
+			var value string
+			value, err = cmd.Flags().GetString(f.Name)
+			values = []string{value}
+		case "stringSlice":
+			values, err = cmd.Flags().GetStringSlice(f.Name)
+		case "bool":
+			var flag bool
+			flag, err = cmd.Flags().GetBool(f.Name)
+		}
+
+		nameToFlags[f.Name] = values
+
+	})
+	return nameToFlags, err
+}
+
 // TODO: allow multiple runs to have an actual cache usage
 var matchCmd = &cobra.Command{
 	Use:   "match",
@@ -30,10 +60,7 @@ var matchCmd = &cobra.Command{
 		}
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		nameToFlag := make(map[string]string, cmd.Flags().NFlag())
-		cmd.Flags().Visit(func(f *pflag.Flag) {
-			nameToFlag[f.Name] = cmd.Flag(f.Name).Value.String()
-		})
+		nameToFlags := processFlagsValues(cmd)
 
 		client := pokeapi.NewPokeApiClient()
 		pokemons, err := characteristics.MatchEmAll(nameToFlag, client)
@@ -55,10 +82,10 @@ var matchCmd = &cobra.Command{
 }
 
 func init() {
-	matchCmd.Flags().String("type", "", "Type of the pokemon")
+	matchCmd.Flags().StringSlice("type", []string{}, "Type of the pokemon")
 	matchCmd.Flags().String("generation", "", "Generation of the pokemon in the form generation-Z, where Z is a roman numeral from 1 to 9")
-	matchCmd.Flags().String("move", "", "TM or HM in pokemon games")
-	matchCmd.Flags().String("ability", "", "Ability of the pokemon (including hidden)")
+	matchCmd.Flags().StringSlice("move", []string{}, "TM or HM in pokemon games")
+	matchCmd.Flags().StringSlice("ability", []string{}, "Ability of the pokemon (including hidden)")
 	matchCmd.Flags().Bool("ultra-beast", true, "Ultra beast pokemons")
 	rootCmd.AddCommand(matchCmd)
 }
