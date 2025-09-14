@@ -33,12 +33,14 @@ func newCacheEntry(value []byte) cacheEntry {
 
 func (c *cache) add(name string, value []byte) {
 	entry := newCacheEntry(value)
-	defer c.mux.Lock()
+	c.mux.Lock()
+	defer c.mux.Unlock()
 	c.entries[name] = entry
 }
 
 func (c *cache) delete(name string) {
-	defer c.mux.Lock()
+	c.mux.Lock()
+	defer c.mux.Unlock()
 	delete(c.entries, name)
 }
 

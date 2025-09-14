@@ -70,5 +70,6 @@ func (c pokeApiClient) FetchPokemons(characteristic, value string) ([]byte, erro
 	if response.StatusCode != http.StatusOK {
 		return nil, newHttpError(response.StatusCode, body)
 	}
+	c.cache.add(url, body)
 	return body, nil
 }
