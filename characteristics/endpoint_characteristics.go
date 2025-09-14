@@ -3,14 +3,14 @@ package characteristics
 import (
 	"encoding/json"
 
-	"github.com/CarusoVitor/dokuex/pokeapi"
+	"github.com/CarusoVitor/dokuex/api"
 )
 
 // endpointCharacteristic are the ones that query the api directly as
 // /characteristic_name/{characteristic}
 type endpointCharacteristic struct {
 	name      string
-	client    pokeapi.PokeClient
+	client    api.PokeClient
 	formatter func([]byte) (PokemonSet, error)
 }
 
@@ -22,7 +22,7 @@ func (ac endpointCharacteristic) getPokemons(value string) (PokemonSet, error) {
 	return ac.formatter(raw)
 }
 
-func newTypeCharacteristic(client pokeapi.PokeClient) endpointCharacteristic {
+func newTypeCharacteristic(client api.PokeClient) endpointCharacteristic {
 	return endpointCharacteristic{
 		name:      typeName,
 		client:    client,
@@ -30,7 +30,7 @@ func newTypeCharacteristic(client pokeapi.PokeClient) endpointCharacteristic {
 	}
 }
 
-func newGenerationCharacteristic(client pokeapi.PokeClient) endpointCharacteristic {
+func newGenerationCharacteristic(client api.PokeClient) endpointCharacteristic {
 	return endpointCharacteristic{
 		name:      generationName,
 		client:    client,
@@ -38,7 +38,7 @@ func newGenerationCharacteristic(client pokeapi.PokeClient) endpointCharacterist
 	}
 }
 
-func newMoveCharacteristic(client pokeapi.PokeClient) endpointCharacteristic {
+func newMoveCharacteristic(client api.PokeClient) endpointCharacteristic {
 	return endpointCharacteristic{
 		name:      moveName,
 		client:    client,
@@ -46,7 +46,7 @@ func newMoveCharacteristic(client pokeapi.PokeClient) endpointCharacteristic {
 	}
 }
 
-func newAbilityCharacteristic(client pokeapi.PokeClient) endpointCharacteristic {
+func newAbilityCharacteristic(client api.PokeClient) endpointCharacteristic {
 	return endpointCharacteristic{
 		name:      abilityName,
 		client:    client,
@@ -55,7 +55,7 @@ func newAbilityCharacteristic(client pokeapi.PokeClient) endpointCharacteristic 
 }
 
 func formatTypeResponse(values []byte) (PokemonSet, error) {
-	var typeResp pokeapi.TypeResponse
+	var typeResp api.TypeResponse
 	if err := json.Unmarshal(values, &typeResp); err != nil {
 		return nil, err
 	}
@@ -67,7 +67,7 @@ func formatTypeResponse(values []byte) (PokemonSet, error) {
 }
 
 func formatGenerationResponse(values []byte) (PokemonSet, error) {
-	var generationResp pokeapi.GenerationResponse
+	var generationResp api.GenerationResponse
 	if err := json.Unmarshal(values, &generationResp); err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func formatGenerationResponse(values []byte) (PokemonSet, error) {
 }
 
 func formatMoveResponse(values []byte) (PokemonSet, error) {
-	var moveResp pokeapi.MoveResponse
+	var moveResp api.MoveResponse
 	if err := json.Unmarshal(values, &moveResp); err != nil {
 		return nil, err
 	}
@@ -93,7 +93,7 @@ func formatMoveResponse(values []byte) (PokemonSet, error) {
 }
 
 func formatAbilityResponse(values []byte) (PokemonSet, error) {
-	var abilityResp pokeapi.AbilityResponse
+	var abilityResp api.AbilityResponse
 	if err := json.Unmarshal(values, &abilityResp); err != nil {
 		return nil, err
 	}

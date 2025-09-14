@@ -1,11 +1,11 @@
 package characteristics
 
-import "github.com/CarusoVitor/dokuex/pokeapi"
+import "github.com/CarusoVitor/dokuex/api"
 
 const ultraBeastAbility = "beast-boost"
 
 type ultraBeastCharacteristic struct {
-	client pokeapi.PokeClient
+	client api.PokeClient
 }
 
 func (ubc ultraBeastCharacteristic) getPokemons(value string) (PokemonSet, error) {
@@ -16,6 +16,6 @@ func (ubc ultraBeastCharacteristic) getPokemons(value string) (PokemonSet, error
 	return formatAbilityResponse(raw)
 }
 
-func newUltraBeastCharacteristic(client pokeapi.PokeClient) ultraBeastCharacteristic {
+func newUltraBeastCharacteristic(client api.PokeClient) ultraBeastCharacteristic {
 	return ultraBeastCharacteristic{client: client}
 }

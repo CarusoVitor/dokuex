@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/CarusoVitor/dokuex/api"
 	"github.com/CarusoVitor/dokuex/characteristics"
-	"github.com/CarusoVitor/dokuex/pokeapi"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
@@ -68,7 +68,7 @@ var matchCmd = &cobra.Command{
 			panic(err)
 		}
 
-		client := pokeapi.NewPokeApiClient()
+		client := api.NewPokeApiClient()
 		pokemons, err := characteristics.MatchEmAll(nameToValues, client)
 
 		if err != nil {

@@ -1,5 +1,5 @@
 // currently only the pokemon list fields are queried
-package pokeapi
+package api
 
 type TypeResponse struct {
 	Pokemon []struct {

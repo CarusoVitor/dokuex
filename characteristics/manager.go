@@ -3,7 +3,7 @@ package characteristics
 import (
 	"fmt"
 
-	"github.com/CarusoVitor/dokuex/pokeapi"
+	"github.com/CarusoVitor/dokuex/api"
 )
 
 const (
@@ -31,10 +31,10 @@ type characteristic interface {
 }
 
 type characteristicManager struct {
-	client pokeapi.PokeClient
+	client api.PokeClient
 }
 
-func newCharacteristicManager(client pokeapi.PokeClient) characteristicManager {
+func newCharacteristicManager(client api.PokeClient) characteristicManager {
 	return characteristicManager{client: client}
 }
 

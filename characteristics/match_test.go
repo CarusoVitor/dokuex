@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/CarusoVitor/dokuex/pokeapi"
+	"github.com/CarusoVitor/dokuex/api"
 )
 
 func Test_intersectSets(t *testing.T) {
@@ -108,7 +108,7 @@ func TestMatchEmAll(t *testing.T) {
 
 	type args struct {
 		nameToValue map[string][]string
-		client      pokeapi.PokeClient
+		client      api.PokeClient
 	}
 	tests := []struct {
 		name    string

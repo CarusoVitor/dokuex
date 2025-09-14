@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/CarusoVitor/dokuex/pokeapi"
+	"github.com/CarusoVitor/dokuex/api"
 )
 
 type PokemonSet = map[string]struct{}
@@ -34,7 +34,7 @@ func intersectSets(smaller, bigger PokemonSet) PokemonSet {
 // and returns a set of pokemon names that match all characteristics
 func MatchEmAll(
 	nameToValues map[string][]string,
-	pokeApiClient pokeapi.PokeClient,
+	pokeApiClient api.PokeClient,
 ) (PokemonSet, error) {
 	manager := newCharacteristicManager(pokeApiClient)
 	pokemons := make(PokemonSet, 0)
@@ -46,7 +46,7 @@ func MatchEmAll(
 		for _, value := range values {
 			result, err := char.getPokemons(value)
 
-			var httpErr pokeapi.HttpError
+			var httpErr api.HttpError
 			if errors.As(err, &httpErr) {
 				if httpErr.StatusCode == http.StatusNotFound {
 					return nil, fmt.Errorf("%s is not a valid value for %s characteristic", value, name)
