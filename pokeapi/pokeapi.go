@@ -32,16 +32,16 @@ type pokeApiClient struct {
 }
 
 type HttpError struct {
-	statusCode int
+	StatusCode int
 	message    []byte
 }
 
 func (h HttpError) Error() string {
-	return fmt.Sprintf("[%d] - %s", h.statusCode, h.message)
+	return fmt.Sprintf("[%d] - %s", h.StatusCode, h.message)
 }
 
-func newHttpError(statusCode int, message []byte) HttpError {
-	return HttpError{statusCode: statusCode, message: message}
+func newHttpError(StatusCode int, message []byte) HttpError {
+	return HttpError{StatusCode: StatusCode, message: message}
 }
 
 func (c pokeApiClient) formatUrl(characteristic, value string) string {

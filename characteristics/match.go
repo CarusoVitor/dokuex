@@ -1,7 +1,9 @@
 package characteristics
 
 import (
+	"errors"
 	"fmt"
+	"net/http"
 
 	"github.com/CarusoVitor/dokuex/pokeapi"
 )
@@ -43,9 +45,18 @@ func MatchEmAll(
 		}
 		for _, value := range values {
 			result, err := char.getPokemons(value)
-			if len(result) == 0 {
-				return result, fmt.Errorf("error getting pokemons with characteristic %s: %w", name, err)
+
+			var httpErr pokeapi.HttpError
+			if errors.As(err, &httpErr) {
+				if httpErr.StatusCode == http.StatusNotFound {
+					return nil, fmt.Errorf("%s is not a valid value for %s characteristic", value, name)
+				}
 			}
+
+			if err != nil {
+				return nil, fmt.Errorf("error getting pokemons with characteristic %s: %w", name, err)
+			}
+
 			if len(pokemons) == 0 {
 				pokemons = make(PokemonSet, len(result))
 				for name := range result {

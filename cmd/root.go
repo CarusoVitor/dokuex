@@ -89,9 +89,9 @@ var matchCmd = &cobra.Command{
 
 func init() {
 	matchCmd.Flags().StringSlice("type", []string{}, "Type of the pokemon")
-	matchCmd.Flags().String("generation", "", "Generation of the pokemon in the form generation-Z, where Z is a roman numeral from 1 to 9")
-	matchCmd.Flags().StringSlice("move", []string{}, "TM or HM in pokemon games")
-	matchCmd.Flags().StringSlice("ability", []string{}, "Ability of the pokemon (including hidden)")
+	matchCmd.Flags().String("generation", "", "Pokemon generation in generation-Z form, where Z is a roman numeral from 1 to 9")
+	matchCmd.Flags().StringSlice("move", []string{}, "Pokemon moves")
+	matchCmd.Flags().StringSlice("ability", []string{}, "Pokemon abilities (including hidden)")
 	matchCmd.Flags().Bool("ultra-beast", true, "Ultra beast pokemons")
 	rootCmd.AddCommand(matchCmd)
 }
