@@ -11,6 +11,9 @@ import (
 const pokeapiUrl string = "https://pokeapi.co/api/v2"
 const clientTimeout time.Duration = time.Second * 60
 
+type PokeClient interface {
+	FetchPokemons(characteristic, value string) ([]byte, error)
+}
 
 func NewPokeApiClient() *pokeApiClient {
 	cache := newCache()

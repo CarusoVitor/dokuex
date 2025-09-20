@@ -1,4 +1,4 @@
-package api
+package scraper
 
 import (
 	"fmt"
@@ -11,7 +11,7 @@ import (
 const bulbapediaUrl = "https://bulbapedia.bulbagarden.net/wiki/"
 const megaTableHeader = "Height and weight comparisons"
 
-type BulbaClient interface {
+type BulbaScraper interface {
 	ScrapPokemons(characteristic string) ([]string, error)
 }
 
