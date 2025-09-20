@@ -33,15 +33,15 @@ type characteristic interface {
 }
 
 type characteristicManager struct {
-	pokeApiClient api.PokeClient
-	bulbaScraper  scraper.BulbaScraper
+	pokeApiClient  api.PokeClient
+	serebiiScraper scraper.SerebiiScraper
 }
 
 func newCharacteristicManager(
 	pokeApiClient api.PokeClient,
-	bulbaScraper scraper.BulbaScraper,
+	serebiiScraper scraper.SerebiiScraper,
 ) *characteristicManager {
-	return &characteristicManager{pokeApiClient: pokeApiClient, bulbaScraper: bulbaScraper}
+	return &characteristicManager{pokeApiClient: pokeApiClient, serebiiScraper: serebiiScraper}
 }
 
 func (cm characteristicManager) createCharacteristic(name string) (characteristic, error) {
@@ -57,7 +57,7 @@ func (cm characteristicManager) createCharacteristic(name string) (characteristi
 	case ultraBeastName:
 		return newUltraBeastCharacteristic(cm.pokeApiClient), nil
 	case megaName:
-		return newMegaCharacteristic(cm.bulbaScraper), nil
+		return newMegaCharacteristic(cm.serebiiScraper), nil
 	}
 	return nil, newInvalidCharacteristicsError(name)
 }

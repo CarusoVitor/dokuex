@@ -57,9 +57,9 @@ var matchCmd = &cobra.Command{
 		}
 
 		pokeApiClient := api.NewPokeApiClient()
-		bulbaScraper := scraper.NewBulbapediaScraper()
+		serebiiScraper := scraper.NewSerebiiScraper()
 
-		pokemons, err := characteristics.MatchEmAll(nameToValues, pokeApiClient, bulbaScraper)
+		pokemons, err := characteristics.MatchEmAll(nameToValues, pokeApiClient, serebiiScraper)
 
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)

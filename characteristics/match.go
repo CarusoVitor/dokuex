@@ -36,9 +36,9 @@ func intersectSets(smaller, bigger PokemonSet) PokemonSet {
 func MatchEmAll(
 	nameToValues map[string][]string,
 	pokeApiClient api.PokeClient,
-	bulbaScraper scraper.BulbaScraper,
+	serebiiScraper scraper.SerebiiScraper,
 ) (PokemonSet, error) {
-	manager := newCharacteristicManager(pokeApiClient, bulbaScraper)
+	manager := newCharacteristicManager(pokeApiClient, serebiiScraper)
 	pokemons := make(PokemonSet, 0)
 	for name, values := range nameToValues {
 		char, err := manager.createCharacteristic(name)

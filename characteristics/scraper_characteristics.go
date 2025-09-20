@@ -3,12 +3,12 @@ package characteristics
 import "github.com/CarusoVitor/dokuex/scraper"
 
 type scraperCharacteristic struct {
-	name         string
-	bulbaScraper scraper.BulbaScraper
+	name           string
+	serebiiScraper scraper.SerebiiScraper
 }
 
 func (sc scraperCharacteristic) getPokemons(value string) (PokemonSet, error) {
-	pokemons, err := sc.bulbaScraper.ScrapPokemons(sc.name)
+	pokemons, err := sc.serebiiScraper.ScrapPokemons(sc.name)
 	if err != nil {
 		return nil, err
 	}
@@ -20,9 +20,9 @@ func (sc scraperCharacteristic) getPokemons(value string) (PokemonSet, error) {
 	return set, nil
 }
 
-func newMegaCharacteristic(bulbaScraper scraper.BulbaScraper) scraperCharacteristic {
+func newMegaCharacteristic(serebiiScraper scraper.SerebiiScraper) scraperCharacteristic {
 	return scraperCharacteristic{
-		name:         megaName,
-		bulbaScraper: bulbaScraper,
+		name:           megaName,
+		serebiiScraper: serebiiScraper,
 	}
 }

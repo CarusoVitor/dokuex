@@ -1,27 +1,28 @@
 package scraper
 
 import (
+	"errors"
 	"fmt"
 	"log/slog"
-	"strings"
 
 	"github.com/gocolly/colly/v2"
 )
 
-const bulbapediaUrl = "https://bulbapedia.bulbagarden.net/wiki"
-const megaTableHeader = "Height and weight comparisons"
+const serebiiUrl = "https://www.serebii.net"
+const megaPage = "pokemon/megaevolution"
 
-type BulbaScraper interface {
+type SerebiiScraper interface {
 	ScrapPokemons(characteristic string) ([]string, error)
 }
 
-type bulbapediaScraper struct {
-	baseUrl string
+type serebiiScraper struct {
+	baseUrl     string
+	callbackErr error
 }
 
-func NewBulbapediaScraper() *bulbapediaScraper {
-	return &bulbapediaScraper{
-		baseUrl: bulbapediaUrl,
+func NewSerebiiScraper() *serebiiScraper {
+	return &serebiiScraper{
+		baseUrl: serebiiUrl,
 	}
 }
 
@@ -33,62 +34,70 @@ func (uh UnexpectedHtmlError) Error() string {
 	return fmt.Sprintf("html parsed is not as expected: %s", uh.message)
 }
 
-// mega scraps Bulbapedia's Mega Evolution page to obtain all mega pokemons.
-// Since there are multiple tables with different comparisons, we query only
-// one which have all mega pokemons.
+var ErrForbidden error = errors.New("unable to acess page, probably behind proxy")
 
-// The html table has the following header:
-// Dex (1) | Pokemon (2) | Heigth (before mega) (3) | Weigth (before mega) (4) | \
-// Mega-Evolved Pokemon (5) | Heigth (after mega) (6) | Weigth (after mega) (7) | \
-// Heigth (increased/decreased) (8) | Weigth (increased/decreased) (9)
-func (bs bulbapediaScraper) mega() ([]string, error) {
+func (bs serebiiScraper) setupCollector() *colly.Collector {
 	c := colly.NewCollector()
 
-	megas := make([]string, 0)
-	var err error
-
-	c.OnHTML("table.roundy.sortable", func(e *colly.HTMLElement) {
-		prev := e.DOM.Prev().Text()
-		slog.Debug("table", "prev", prev)
-		if prev != megaTableHeader {
-			return
-		}
-		e.ForEach("tr", func(_ int, row *colly.HTMLElement) {
-			value := row.ChildText("td:nth-child(1)")
-			if len(value) == 0 {
-				return
-			}
-			if strings.HasPrefix(value, "#") {
-				mega := row.ChildText("td:nth-child(5)")
-				if len(mega) == 0 {
-					err = UnexpectedHtmlError{"mega pokemon name is empty"}
-				}
-				megas = append(megas, mega)
-			} else {
-				err = UnexpectedHtmlError{"mega first element is not the dex number"}
-			}
-
-		})
-	})
 	c.OnRequest(func(r *colly.Request) {
 		slog.Debug("Visiting", "url", r.URL.String())
 	})
 
-	c.Visit(fmt.Sprintf("%s/Mega_Evolution", bs.baseUrl))
+	c.OnError(func(r *colly.Response, err error) {
+		bs.callbackErr = err
+		if err.Error() == "Forbidden" {
+			bs.callbackErr = ErrForbidden
+		}
+	})
+	return c
+}
+
+func (bs serebiiScraper) formatUrl(page string) string {
+	return fmt.Sprintf("%s/%s.shtml", bs.baseUrl, page)
+}
+
+// mega scraps Serebii's Mega Evolution page to obtain all mega pokémons.
+func (bs serebiiScraper) mega(c *colly.Collector) ([]string, error) {
+	megas := make([]string, 0)
+	var err error
+
+	c.OnHTML("table.trainer", func(e *colly.HTMLElement) {
+		// skip other tables with same class
+		if e.ChildText("tr:nth-child(1)") != "Mega Evolved Pokémon" {
+			return
+		}
+		e.ForEach("tr", func(_ int, col *colly.HTMLElement) {
+			e.ForEach("td > table > tbody", func(_ int, row *colly.HTMLElement) {
+				pokemon := row.ChildText("tr:nth-child(2)")
+				if len(pokemon) == 0 {
+					err = UnexpectedHtmlError{"pokémon name is empty"}
+					return
+				}
+				megas = append(megas, pokemon)
+			})
+		})
+	})
+
+	c.Visit(bs.formatUrl(megaPage))
 	return megas, err
 }
 
-func (bs *bulbapediaScraper) ScrapPokemons(characteristic string) ([]string, error) {
+func (bs *serebiiScraper) ScrapPokemons(characteristic string) ([]string, error) {
 	var pokemons []string
 	var err error = nil
 
+	collector := bs.setupCollector()
 	switch characteristic {
 	case "mega":
-		pokemons, err = bs.mega()
+		pokemons, err = bs.mega(collector)
 	default:
 		return nil, fmt.Errorf("characteristic %s was not implemented", characteristic)
 	}
 	slog.Info("Total pokemons found scrapping", "num", len(pokemons))
+
+	if bs.callbackErr != nil {
+		return nil, bs.callbackErr
+	}
 
 	if len(pokemons) == 0 {
 		return nil, UnexpectedHtmlError{"scrap resulted in an empty list (internal error)"}
