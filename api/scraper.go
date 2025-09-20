@@ -2,35 +2,54 @@ package api
 
 import (
 	"fmt"
-	"os"
+	"log/slog"
 	"strings"
 
 	"github.com/gocolly/colly/v2"
 )
 
 const bulbapediaUrl = "https://bulbapedia.bulbagarden.net/wiki/"
+const megaTableHeader = "Height and weight comparisons"
+
+type BulbaClient interface {
+	ScrapPokemons(characteristic string) ([]string, error)
+}
 
 type bulbapediaScraper struct {
-	cache   *cache
 	baseUrl string
 }
 
-func NewBulbapediaScraper() *bulbapediaScraper {
-	cache := newCache()
+func NewBulbapediaScraper(collector colly.Collector) *bulbapediaScraper {
 	return &bulbapediaScraper{
-		cache:   cache,
-		baseUrl: pokeapiUrl,
+		baseUrl: bulbapediaUrl,
 	}
 }
 
-func (bs bulbapediaScraper) mega() []byte {
+type UnexpectedHtmlError struct {
+	message string
+}
+
+func (uh UnexpectedHtmlError) Error() string {
+	return fmt.Sprintf("html parsed is not as expected: %s", uh.message)
+}
+
+// mega scraps Bulbapedia's Mega Evolution page to obtain all mega pokemons.
+// Since there are multiple tables with different comparisons, we query only
+// one which have all mega pokemons.
+
+// The html table has the following header:
+// Dex (1) | Pokemon (2) | Heigth (before mega) (3) | Weigth (before mega) (4) | \
+// Mega-Evolved Pokemon (5) | Heigth (after mega) (6) | Weigth (after mega) (7) | \
+// Heigth (increased/decreased) (8) | Weigth (increased/decreased) (9)
+func (bs bulbapediaScraper) mega() ([]string, error) {
 	c := colly.NewCollector()
 
-	megas := make([]byte, 0)
+	megas := make([]string, 0)
+	var err error
 
 	c.OnHTML("table.roundy.sortable", func(e *colly.HTMLElement) {
 		prev := e.DOM.Prev().Text()
-		if prev != "Height and weight comparisons" {
+		if prev != megaTableHeader {
 			return
 		}
 		e.ForEach("tr", func(_ int, row *colly.HTMLElement) {
@@ -39,36 +58,36 @@ func (bs bulbapediaScraper) mega() []byte {
 				return
 			}
 			if strings.HasPrefix(value, "#") {
-				// single row pokedex number
 				mega := row.ChildText("td:nth-child(5)")
+				if len(mega) == 0 {
+					err = UnexpectedHtmlError{"mega pokemon name is empty"}
+				}
 				megas = append(megas, mega)
-				fmt.Printf("%s\n", mega)
-			} else if strings.HasPrefix(value, "Mega") {
-				megas = append(megas, value)
-				fmt.Printf("%s\n", value)
 			} else {
-				fmt.Fprintf(os.Stderr, "invalid form %s", value)
+				err = UnexpectedHtmlError{"mega first element is not the dex number"}
 			}
 
 		})
 	})
 	c.OnRequest(func(r *colly.Request) {
-		fmt.Println("Visiting", r.URL.String())
+		slog.Debug("Visiting", "url", r.URL.String())
 	})
 
-	c.Visit("https://bulbapedia.bulbagarden.net/wiki/Mega_Evolution")
+	c.Visit(fmt.Sprintf("%s/Mega_Evolution", bs.baseUrl))
+
+	return megas, err
 }
 
-func (bs *bulbapediaScraper) FetchPokemons(characteristic, value string) ([]byte, error) {
-	if pokemons, ok := bs.cache.get(characteristic); ok {
-		return pokemons, nil
-	}
+func (bs *bulbapediaScraper) ScrapPokemons(characteristic string) ([]string, error) {
+	var pokemons []string
+	var err error = nil
 
-	var pokemons []byte
 	switch characteristic {
 	case "mega":
-		pokemons = bs.mega()
+		pokemons, err = bs.mega()
+	default:
+		return nil, fmt.Errorf("characteristic %s was not implemented", characteristic)
 	}
-	bs.cache.add(characteristic, pokemons)
-	return pokemons, nil
+
+	return pokemons, err
 }
