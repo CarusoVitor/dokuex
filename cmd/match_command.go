@@ -6,6 +6,7 @@ import (
 
 	"github.com/CarusoVitor/dokuex/api"
 	"github.com/CarusoVitor/dokuex/characteristics"
+	"github.com/CarusoVitor/dokuex/scraper"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
@@ -55,8 +56,10 @@ var matchCmd = &cobra.Command{
 			panic(err)
 		}
 
-		client := api.NewPokeApiClient()
-		pokemons, err := characteristics.MatchEmAll(nameToValues, client)
+		pokeApiClient := api.NewPokeApiClient()
+		bulbaScraper := scraper.NewBulbapediaScraper()
+
+		pokemons, err := characteristics.MatchEmAll(nameToValues, pokeApiClient, bulbaScraper)
 
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)

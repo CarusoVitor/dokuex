@@ -8,7 +8,7 @@ import (
 	"github.com/gocolly/colly/v2"
 )
 
-const bulbapediaUrl = "https://bulbapedia.bulbagarden.net/wiki/"
+const bulbapediaUrl = "https://bulbapedia.bulbagarden.net/wiki"
 const megaTableHeader = "Height and weight comparisons"
 
 type BulbaScraper interface {
@@ -19,7 +19,7 @@ type bulbapediaScraper struct {
 	baseUrl string
 }
 
-func NewBulbapediaScraper(collector colly.Collector) *bulbapediaScraper {
+func NewBulbapediaScraper() *bulbapediaScraper {
 	return &bulbapediaScraper{
 		baseUrl: bulbapediaUrl,
 	}
@@ -49,6 +49,7 @@ func (bs bulbapediaScraper) mega() ([]string, error) {
 
 	c.OnHTML("table.roundy.sortable", func(e *colly.HTMLElement) {
 		prev := e.DOM.Prev().Text()
+		slog.Debug("table", "prev", prev)
 		if prev != megaTableHeader {
 			return
 		}
@@ -74,7 +75,6 @@ func (bs bulbapediaScraper) mega() ([]string, error) {
 	})
 
 	c.Visit(fmt.Sprintf("%s/Mega_Evolution", bs.baseUrl))
-
 	return megas, err
 }
 
@@ -87,6 +87,11 @@ func (bs *bulbapediaScraper) ScrapPokemons(characteristic string) ([]string, err
 		pokemons, err = bs.mega()
 	default:
 		return nil, fmt.Errorf("characteristic %s was not implemented", characteristic)
+	}
+	slog.Info("Total pokemons found scrapping", "num", len(pokemons))
+
+	if len(pokemons) == 0 {
+		return nil, UnexpectedHtmlError{"scrap resulted in an empty list (internal error)"}
 	}
 
 	return pokemons, err

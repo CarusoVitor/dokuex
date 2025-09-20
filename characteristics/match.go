@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/CarusoVitor/dokuex/api"
+	"github.com/CarusoVitor/dokuex/scraper"
 )
 
 type PokemonSet = map[string]struct{}
@@ -35,8 +36,9 @@ func intersectSets(smaller, bigger PokemonSet) PokemonSet {
 func MatchEmAll(
 	nameToValues map[string][]string,
 	pokeApiClient api.PokeClient,
+	bulbaScraper scraper.BulbaScraper,
 ) (PokemonSet, error) {
-	manager := newCharacteristicManager(pokeApiClient)
+	manager := newCharacteristicManager(pokeApiClient, bulbaScraper)
 	pokemons := make(PokemonSet, 0)
 	for name, values := range nameToValues {
 		char, err := manager.createCharacteristic(name)
