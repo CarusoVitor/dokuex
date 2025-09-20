@@ -40,7 +40,7 @@ func (bs serebiiScraper) setupCollector() *colly.Collector {
 	c := colly.NewCollector()
 
 	c.OnRequest(func(r *colly.Request) {
-		slog.Debug("Visiting", "url", r.URL.String())
+		slog.Info("called", "url", r.URL.String())
 	})
 
 	c.OnError(func(r *colly.Response, err error) {
