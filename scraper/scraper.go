@@ -36,7 +36,7 @@ func (uh UnexpectedHtmlError) Error() string {
 
 var ErrForbidden error = errors.New("unable to acess page, probably behind proxy")
 
-func (bs serebiiScraper) setupCollector() *colly.Collector {
+func (bs *serebiiScraper) setupCollector() *colly.Collector {
 	c := colly.NewCollector()
 
 	c.OnRequest(func(r *colly.Request) {
@@ -57,39 +57,34 @@ func (bs serebiiScraper) formatUrl(page string) string {
 }
 
 // mega scraps Serebii's Mega Evolution page to obtain all mega pokémons.
-func (bs serebiiScraper) mega(c *colly.Collector) ([]string, error) {
+func (bs serebiiScraper) mega(c *colly.Collector) []string {
 	megas := make([]string, 0)
-	var err error
 
 	c.OnHTML("table.trainer", func(e *colly.HTMLElement) {
 		// skip other tables with same class
 		if e.ChildText("tr:nth-child(1)") != "Mega Evolved Pokémon" {
 			return
 		}
-		e.ForEach("tr", func(_ int, col *colly.HTMLElement) {
-			e.ForEach("td > table > tbody", func(_ int, row *colly.HTMLElement) {
-				pokemon := row.ChildText("tr:nth-child(2)")
-				if len(pokemon) == 0 {
-					err = UnexpectedHtmlError{"pokémon name is empty"}
-					return
-				}
-				megas = append(megas, pokemon)
-			})
+		e.ForEach("td", func(_ int, td *colly.HTMLElement) {
+			pokemon := td.ChildText("table tr:nth-child(2)")
+			if len(pokemon) == 0 {
+				return
+			}
+			megas = append(megas, pokemon)
 		})
 	})
 
 	c.Visit(bs.formatUrl(megaPage))
-	return megas, err
+	return megas
 }
 
 func (bs *serebiiScraper) ScrapPokemons(characteristic string) ([]string, error) {
 	var pokemons []string
-	var err error = nil
 
 	collector := bs.setupCollector()
 	switch characteristic {
 	case "mega":
-		pokemons, err = bs.mega(collector)
+		pokemons = bs.mega(collector)
 	default:
 		return nil, fmt.Errorf("characteristic %s was not implemented", characteristic)
 	}
@@ -103,5 +98,5 @@ func (bs *serebiiScraper) ScrapPokemons(characteristic string) ([]string, error)
 		return nil, UnexpectedHtmlError{"scrap resulted in an empty list (internal error)"}
 	}
 
-	return pokemons, err
+	return pokemons, nil
 }
