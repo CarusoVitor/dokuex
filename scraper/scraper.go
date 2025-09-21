@@ -34,7 +34,7 @@ func (uh UnexpectedHtmlError) Error() string {
 	return fmt.Sprintf("html parsed is not as expected: %s", uh.message)
 }
 
-var ErrForbidden error = errors.New("unable to acess page, probably behind proxy")
+var ErrForbidden error = errors.New("unable to access page, probably behind proxy")
 
 func (bs *serebiiScraper) setupCollector() *colly.Collector {
 	c := colly.NewCollector()
