@@ -46,7 +46,7 @@ func newMegaCharacteristic(serebiiScraper scraper.SerebiiScraper) scraperCharact
 // 2. Three word mega names e.g Mega Charizard X
 // Base name must also be returned since some characteristics only use them
 func formatMega(pokemons []string) ([]string, error) {
-	formatted := make([]string, len(pokemons)*2)
+	formatted := make([]string, 0, len(pokemons)*2)
 
 	for idx := range pokemons {
 		parts := strings.Split(strings.ToLower(pokemons[idx]), " ")
