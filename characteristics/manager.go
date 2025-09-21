@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/CarusoVitor/dokuex/api"
+	"github.com/CarusoVitor/dokuex/scraper"
 )
 
 const (
@@ -12,6 +13,7 @@ const (
 	moveName       string = "move"
 	abilityName    string = "ability"
 	ultraBeastName string = "ultra-beast"
+	megaName       string = "mega"
 )
 
 type invalidCharacteristicError struct {
@@ -31,25 +33,31 @@ type characteristic interface {
 }
 
 type characteristicManager struct {
-	client api.PokeClient
+	pokeApiClient  api.PokeClient
+	serebiiScraper scraper.SerebiiScraper
 }
 
-func newCharacteristicManager(client api.PokeClient) characteristicManager {
-	return characteristicManager{client: client}
+func newCharacteristicManager(
+	pokeApiClient api.PokeClient,
+	serebiiScraper scraper.SerebiiScraper,
+) *characteristicManager {
+	return &characteristicManager{pokeApiClient: pokeApiClient, serebiiScraper: serebiiScraper}
 }
 
-func (cm characteristicManager) createCharacteristic(name string) (characteristic, error) {
+func (cm *characteristicManager) createCharacteristic(name string) (characteristic, error) {
 	switch name {
 	case typeName:
-		return newTypeCharacteristic(cm.client), nil
+		return newTypeCharacteristic(cm.pokeApiClient), nil
 	case generationName:
-		return newGenerationCharacteristic(cm.client), nil
+		return newGenerationCharacteristic(cm.pokeApiClient), nil
 	case moveName:
-		return newMoveCharacteristic(cm.client), nil
+		return newMoveCharacteristic(cm.pokeApiClient), nil
 	case abilityName:
-		return newAbilityCharacteristic(cm.client), nil
+		return newAbilityCharacteristic(cm.pokeApiClient), nil
 	case ultraBeastName:
-		return newUltraBeastCharacteristic(cm.client), nil
+		return newUltraBeastCharacteristic(cm.pokeApiClient), nil
+	case megaName:
+		return newMegaCharacteristic(cm.serebiiScraper), nil
 	}
 	return nil, newInvalidCharacteristicsError(name)
 }
