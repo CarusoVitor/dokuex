@@ -4,12 +4,14 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"strings"
 
 	"github.com/gocolly/colly/v2"
 )
 
 const serebiiUrl = "https://www.serebii.net"
 const megaPage = "pokemon/megaevolution"
+const gmaxPage = "swordshield/gigantamax"
 
 type SerebiiScraper interface {
 	ScrapPokemons(characteristic string) ([]string, error)
@@ -56,7 +58,7 @@ func (bs serebiiScraper) formatUrl(page string) string {
 	return fmt.Sprintf("%s/%s.shtml", bs.baseUrl, page)
 }
 
-// mega scraps Serebii's Mega Evolution page to obtain all mega pokémons.
+// mega scraps Mega Evolution page to obtain all mega pokémons.
 func (bs serebiiScraper) mega(c *colly.Collector) []string {
 	megas := make([]string, 0)
 
@@ -78,13 +80,45 @@ func (bs serebiiScraper) mega(c *colly.Collector) []string {
 	return megas
 }
 
+// gmax scraps Gigantamax page to obtain all gigantamax pokémons.
+// The table has the following header:
+// | No | Pic | Name | Type | Abilities | Location |
+// The pokemon's name element tag also contains the japanese name, which
+// comes after a <br>, e.g "Venusaur<br/>フシギバナ"
+func (bs serebiiScraper) gmax(c *colly.Collector) ([]string, error) {
+	gmaxs := make([]string, 0)
+	var err error
+	c.OnHTML("table.tab", func(e *colly.HTMLElement) {
+		// # explicitly use table.tab to not query inner tables
+		e.ForEach("table.tab > tbody > tr", func(i int, tr *colly.HTMLElement) {
+			// skip header
+			if i == 0 {
+				return
+			}
+			a, _ := tr.DOM.Find("td:nth-child(3) a").Html()
+			name := strings.Split(a, "<br/>")[0]
+			if len(name) == 0 {
+				err = UnexpectedHtmlError{message: "empty pokémon name"}
+				return
+			}
+			gmaxs = append(gmaxs, name)
+		})
+
+	})
+	c.Visit(bs.formatUrl(gmaxPage))
+	return gmaxs, err
+}
+
 func (bs *serebiiScraper) ScrapPokemons(characteristic string) ([]string, error) {
 	var pokemons []string
+	var err error
 
 	collector := bs.setupCollector()
 	switch characteristic {
 	case "mega":
 		pokemons = bs.mega(collector)
+	case "gmax":
+		pokemons, err = bs.gmax(collector)
 	default:
 		return nil, fmt.Errorf("characteristic %s was not implemented", characteristic)
 	}
@@ -92,6 +126,10 @@ func (bs *serebiiScraper) ScrapPokemons(characteristic string) ([]string, error)
 
 	if bs.callbackErr != nil {
 		return nil, bs.callbackErr
+	}
+
+	if err != nil {
+		return nil, err
 	}
 
 	if len(pokemons) == 0 {

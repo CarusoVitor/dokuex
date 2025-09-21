@@ -22,6 +22,7 @@ func init() {
 	matchCmd.Flags().StringSlice("ability", []string{}, "Pokemon abilities (including hidden)")
 	matchCmd.Flags().Bool("ultra-beast", true, "Ultra beast pokemons")
 	matchCmd.Flags().Bool("mega", true, "Mega pokemons and their base forms")
+	matchCmd.Flags().Bool("gmax", true, "Gigantamax pokemons and their base forms")
 	rootCmd.AddCommand(matchCmd)
 }
 
