@@ -95,7 +95,7 @@ func (bs *serebiiScraper) ScrapPokemons(characteristic string) ([]string, error)
 	}
 
 	if len(pokemons) == 0 {
-		return nil, UnexpectedHtmlError{"scrap resulted in an empty list (internal error)"}
+		return nil, UnexpectedHtmlError{"scrape resulted in an empty list (internal error)"}
 	}
 
 	return pokemons, nil

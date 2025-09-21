@@ -44,7 +44,7 @@ func newCharacteristicManager(
 	return &characteristicManager{pokeApiClient: pokeApiClient, serebiiScraper: serebiiScraper}
 }
 
-func (cm characteristicManager) createCharacteristic(name string) (characteristic, error) {
+func (cm *characteristicManager) createCharacteristic(name string) (characteristic, error) {
 	switch name {
 	case typeName:
 		return newTypeCharacteristic(cm.pokeApiClient), nil
