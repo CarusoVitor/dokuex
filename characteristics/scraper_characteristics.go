@@ -39,7 +39,7 @@ func newMegaCharacteristic(serebiiScraper scraper.SerebiiScraper) scraperCharact
 	}
 }
 
-// formatNames format pokemon names to be in the standard lowercase
+// formatMega format pokemon mega names to be in the standard lowercase
 // hyphen separated form with the pokemon name coming first
 // There are two options:
 // 1. Two word mega names e.g Mega Lucario
