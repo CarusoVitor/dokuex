@@ -122,7 +122,7 @@ func (bs *serebiiScraper) ScrapPokemons(characteristic string) ([]string, error)
 	default:
 		return nil, fmt.Errorf("characteristic %s was not implemented", characteristic)
 	}
-	slog.Info("Total pokemons found scrapping", "num", len(pokemons))
+	slog.Debug("Total pokemons found scrapping", "num", len(pokemons))
 
 	if bs.callbackErr != nil {
 		return nil, bs.callbackErr
