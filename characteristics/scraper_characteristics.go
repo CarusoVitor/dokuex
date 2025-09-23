@@ -38,8 +38,15 @@ func newMegaCharacteristic(serebiiScraper scraper.SerebiiScraper) scraperCharact
 		formatter:      formatMega,
 	}
 }
+func newGmaxCharacteristic(serebiiScraper scraper.SerebiiScraper) scraperCharacteristic {
+	return scraperCharacteristic{
+		name:           gmaxName,
+		serebiiScraper: serebiiScraper,
+		formatter:      formatGmax,
+	}
+}
 
-// formatNames format pokemon names to be in the standard lowercase
+// formatMega format pokemon mega names to be in the standard lowercase
 // hyphen separated form with the pokemon name coming first
 // There are two options:
 // 1. Two word mega names e.g Mega Lucario
@@ -61,6 +68,20 @@ func formatMega(pokemons []string) ([]string, error) {
 			sb.WriteString(fmt.Sprintf("-%s", parts[2]))
 		}
 		formatted = append(formatted, sb.String())
+		formatted = append(formatted, name)
+	}
+	return formatted, nil
+}
+
+// formatGmax formats pokemon gmax (Gigantamax) names to be in the standard lowercase
+// hyphen separated form with the pokemon name coming first
+// Base name must also be returned since some characteristics only use them
+func formatGmax(pokemons []string) ([]string, error) {
+	formatted := make([]string, 0, len(pokemons)*2)
+
+	for idx := range pokemons {
+		name := strings.ToLower(pokemons[idx])
+		formatted = append(formatted, fmt.Sprintf("%s-gmax", name))
 		formatted = append(formatted, name)
 	}
 	return formatted, nil

@@ -14,6 +14,7 @@ const (
 	abilityName    string = "ability"
 	ultraBeastName string = "ultra-beast"
 	megaName       string = "mega"
+	gmaxName       string = "gmax"
 )
 
 type invalidCharacteristicError struct {
@@ -58,6 +59,8 @@ func (cm *characteristicManager) createCharacteristic(name string) (characterist
 		return newUltraBeastCharacteristic(cm.pokeApiClient), nil
 	case megaName:
 		return newMegaCharacteristic(cm.serebiiScraper), nil
+	case gmaxName:
+		return newGmaxCharacteristic(cm.serebiiScraper), nil
 	}
 	return nil, newInvalidCharacteristicsError(name)
 }

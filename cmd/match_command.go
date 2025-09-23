@@ -63,6 +63,7 @@ var matchCmd = &cobra.Command{
 
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
+			return
 		}
 		if len(pokemons) == 0 {
 			fmt.Println("No pokemons found matching the given characteristics")
