@@ -95,7 +95,11 @@ func (bs serebiiScraper) gmax(c *colly.Collector) ([]string, error) {
 			if i == 0 {
 				return
 			}
-			a, _ := tr.DOM.Find("td:nth-child(3) a").Html()
+			a, htmlErr := tr.DOM.Find("td:nth-child(3) a").Html()
+			if htmlErr != nil || len(a) == 0 {
+				err = UnexpectedHtmlError{message: fmt.Sprintf("failed to get pokémon name HTML: %v", htmlErr)}
+				return
+			}
 			name := strings.Split(a, "<br/>")[0]
 			if len(name) == 0 {
 				err = UnexpectedHtmlError{message: "empty pokémon name"}

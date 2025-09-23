@@ -73,7 +73,7 @@ func formatMega(pokemons []string) ([]string, error) {
 	return formatted, nil
 }
 
-// formatGmax format pokemon mega names to be in the standard lowercase
+// formatGmax formats pokemon gmax (Gigantamax) names to be in the standard lowercase
 // hyphen separated form with the pokemon name coming first
 // Base name must also be returned since some characteristics only use them
 func formatGmax(pokemons []string) ([]string, error) {
