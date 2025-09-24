@@ -65,9 +65,7 @@ var matchCmd = &cobra.Command{
 			return
 		}
 		fmt.Println("Pokemons found:")
-		i := 0
-		for pokemon := range pokemons {
-			i++
+		for i, pokemon := range pokemons {
 			fmt.Printf("%d. %s\n", i, pokemon)
 		}
 	},
