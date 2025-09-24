@@ -168,13 +168,13 @@ func TestMatchEmAll(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := MatchEmAll(tt.args.nameToValue, tt.args.client, nil)
+			got, err := matchEmAll(tt.args.nameToValue, tt.args.client, nil)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("MatchEmAll() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("matchEmAll() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("MatchEmAll() = %v, want %v", got, tt.want)
+				t.Errorf("matchEmAll() = %v, want %v", got, tt.want)
 			}
 		})
 	}

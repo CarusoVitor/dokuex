@@ -4,9 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/CarusoVitor/dokuex/api"
 	"github.com/CarusoVitor/dokuex/characteristics"
-	"github.com/CarusoVitor/dokuex/scraper"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
@@ -56,10 +54,7 @@ var matchCmd = &cobra.Command{
 			panic(err)
 		}
 
-		pokeApiClient := api.NewPokeApiClient()
-		serebiiScraper := scraper.NewSerebiiScraper()
-
-		pokemons, err := characteristics.MatchEmAll(nameToValues, pokeApiClient, serebiiScraper)
+		pokemons, err := characteristics.Match(nameToValues)
 
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)

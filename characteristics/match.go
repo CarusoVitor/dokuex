@@ -31,9 +31,17 @@ func intersectSets(smaller, bigger PokemonSet) PokemonSet {
 	return intersection
 }
 
-// MatchEmAll takes a map of characteristic names to their desired values
+// Match takes a map of characteristic names to their desired values
 // and returns a set of pokemon names that match all characteristics
-func MatchEmAll(
+func Match(
+	nameToValues map[string][]string,
+) (PokemonSet, error) {
+	pokeApiClient := api.NewPokeApiClient()
+	serebiiScraper := scraper.NewSerebiiScraper()
+	return matchEmAll(nameToValues, pokeApiClient, serebiiScraper)
+}
+
+func matchEmAll(
 	nameToValues map[string][]string,
 	pokeApiClient api.PokeClient,
 	serebiiScraper scraper.SerebiiScraper,
