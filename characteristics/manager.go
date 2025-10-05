@@ -17,16 +17,16 @@ const (
 	gmaxName       string = "gmax"
 )
 
-type invalidCharacteristicError struct {
-	name string
+type InvalidCharacteristicError struct {
+	Name string
 }
 
-func newInvalidCharacteristicsError(name string) invalidCharacteristicError {
-	return invalidCharacteristicError{name: name}
+func newInvalidCharacteristicsError(name string) InvalidCharacteristicError {
+	return InvalidCharacteristicError{Name: name}
 }
 
-func (e invalidCharacteristicError) Error() string {
-	return fmt.Sprintf("characteristic %s was not implemented", e.name)
+func (e InvalidCharacteristicError) Error() string {
+	return fmt.Sprintf("characteristic %s was not implemented", e.Name)
 }
 
 type characteristic interface {
