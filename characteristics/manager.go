@@ -4,17 +4,21 @@ import (
 	"fmt"
 
 	"github.com/CarusoVitor/dokuex/api"
+	"github.com/CarusoVitor/dokuex/graphql"
 	"github.com/CarusoVitor/dokuex/scraper"
 )
 
 const (
-	typeName       string = "type"
-	generationName string = "generation"
-	moveName       string = "move"
-	abilityName    string = "ability"
-	ultraBeastName string = "ultra-beast"
-	megaName       string = "mega"
-	gmaxName       string = "gmax"
+	TypeName       string = "type"
+	GenerationName string = "generation"
+	MoveName       string = "move"
+	AbilityName    string = "ability"
+	UltraBeastName string = "ultra-beast"
+	MegaName       string = "mega"
+	GmaxName       string = "gmax"
+	LegendaryName  string = "legendary"
+	BabyName       string = "baby"
+	MythicalName   string = "mythical"
 )
 
 type InvalidCharacteristicError struct {
@@ -36,31 +40,44 @@ type characteristic interface {
 type characteristicManager struct {
 	pokeApiClient  api.PokeClient
 	serebiiScraper scraper.SerebiiScraper
+	graphQLClient  graphql.PokeGraphQLClient
 }
 
 func newCharacteristicManager(
 	pokeApiClient api.PokeClient,
 	serebiiScraper scraper.SerebiiScraper,
+	graphQLClient graphql.PokeGraphQLClient,
 ) *characteristicManager {
-	return &characteristicManager{pokeApiClient: pokeApiClient, serebiiScraper: serebiiScraper}
+	return &characteristicManager{
+		pokeApiClient:  pokeApiClient,
+		serebiiScraper: serebiiScraper,
+		graphQLClient:  graphQLClient,
+	}
 }
 
 func (cm *characteristicManager) createCharacteristic(name string) (characteristic, error) {
 	switch name {
-	case typeName:
+	case TypeName:
 		return newTypeCharacteristic(cm.pokeApiClient), nil
-	case generationName:
+	case GenerationName:
 		return newGenerationCharacteristic(cm.pokeApiClient), nil
-	case moveName:
+	case MoveName:
 		return newMoveCharacteristic(cm.pokeApiClient), nil
-	case abilityName:
+	case AbilityName:
 		return newAbilityCharacteristic(cm.pokeApiClient), nil
-	case ultraBeastName:
+	case UltraBeastName:
 		return newUltraBeastCharacteristic(cm.pokeApiClient), nil
-	case megaName:
+	case MegaName:
 		return newMegaCharacteristic(cm.serebiiScraper), nil
-	case gmaxName:
+	case GmaxName:
 		return newGmaxCharacteristic(cm.serebiiScraper), nil
+	case LegendaryName:
+		return newIsLegendaryCharacteristic(cm.graphQLClient), nil
+	case BabyName:
+		return newIsBabyCharacteristic(cm.graphQLClient), nil
+	case MythicalName:
+		return newIsMythicalCharacteristic(cm.graphQLClient), nil
 	}
+
 	return nil, newInvalidCharacteristicsError(name)
 }

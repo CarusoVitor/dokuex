@@ -72,19 +72,19 @@ func createPokeJson(outerField, innerField string, pokes PokemonSet) []byte {
 }
 
 func (ec endpointClient) FetchPokemons(characteristic, value string) ([]byte, error) {
-	if characteristic == typeName {
+	if characteristic == TypeName {
 		return createPokeJson(`{"pokemon":[`, `{"pokemon":{"name":"%s"}}`, ec.typePokemons[value]), nil
 	}
-	if characteristic == generationName {
+	if characteristic == GenerationName {
 		return createPokeJson(`{"pokemon_species":[`, `{"name":"%s"}`, ec.generationPokemons[value]), nil
 	}
-	if characteristic == moveName {
+	if characteristic == MoveName {
 		return createPokeJson(`{"learned_by_pokemon":[`, `{"name":"%s"}`, ec.movePokemons[value]), nil
 	}
 	if value == ultraBeastAbility {
 		return createPokeJson(`{"pokemon":[`, `{"pokemon":{"name":"%s"}}`, ec.ultraBeastPokemons), nil
 	}
-	if characteristic == abilityName {
+	if characteristic == AbilityName {
 		return createPokeJson(`{"pokemon":[`, `{"pokemon":{"name":"%s"}}`, ec.abilityPokemons[value]), nil
 	}
 	return nil, nil

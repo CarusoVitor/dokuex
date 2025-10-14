@@ -33,14 +33,14 @@ func (sc scraperCharacteristic) getPokemons(value string) (PokemonSet, error) {
 
 func newMegaCharacteristic(serebiiScraper scraper.SerebiiScraper) scraperCharacteristic {
 	return scraperCharacteristic{
-		name:           megaName,
+		name:           MegaName,
 		serebiiScraper: serebiiScraper,
 		formatter:      formatMega,
 	}
 }
 func newGmaxCharacteristic(serebiiScraper scraper.SerebiiScraper) scraperCharacteristic {
 	return scraperCharacteristic{
-		name:           gmaxName,
+		name:           GmaxName,
 		serebiiScraper: serebiiScraper,
 		formatter:      formatGmax,
 	}
