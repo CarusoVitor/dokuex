@@ -26,17 +26,17 @@ Currently, the following characteristics are supported by dokuex:
 5. Ultra Beast
 6. Mega
 7. Gigantamax
+8. Baby
+9. Mythical
+10. Legendary
 
 The following characteristics will be implemented in the future:
-1. Baby
-2. Mythical
-3. Legendary
-4. Mono type
-5. Dual type
-6. Evolved by (item, stone, friendship, etc)
-7. Evolution position
-8. Evolution branched
-9. Hisui
-10. First partner
-11. Fossil
-12. Paradox
+1. Mono type
+2. Dual type
+3. Evolved by (item, stone, friendship, etc)
+4. Evolution position
+5. Evolution branched
+6. Hisui
+7. First partner
+8. Fossil
+9. Paradox
