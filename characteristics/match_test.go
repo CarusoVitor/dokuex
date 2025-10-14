@@ -168,7 +168,7 @@ func TestMatchEmAll(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := matchEmAll(tt.args.nameToValue, tt.args.client, nil)
+			got, err := matchEmAll(tt.args.nameToValue, tt.args.client, nil, nil)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("matchEmAll() error = %v, wantErr %v", err, tt.wantErr)
 				return

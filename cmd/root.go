@@ -23,6 +23,9 @@ func init() {
 	matchCmd.Flags().Bool("ultra-beast", true, "Ultra beast pokemons")
 	matchCmd.Flags().Bool("mega", true, "Mega pokemons and their base forms")
 	matchCmd.Flags().Bool("gmax", true, "Gigantamax pokemons and their base forms")
+	matchCmd.Flags().Bool("legendary", true, "Legendary pokemons")
+	matchCmd.Flags().Bool("baby", true, "Baby pokemons")
+	matchCmd.Flags().Bool("mythical", true, "Mythical pokemons")
 	rootCmd.AddCommand(matchCmd)
 }
 

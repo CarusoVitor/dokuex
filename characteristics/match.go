@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/CarusoVitor/dokuex/api"
+	"github.com/CarusoVitor/dokuex/graphql"
 	"github.com/CarusoVitor/dokuex/scraper"
 )
 
@@ -38,8 +39,9 @@ func Match(
 ) ([]string, error) {
 	pokeApiClient := api.NewPokeApiClient()
 	serebiiScraper := scraper.NewSerebiiScraper()
+	graphQlClient := graphql.NewDefaultGraphQLClient()
 
-	set, err := matchEmAll(nameToValues, pokeApiClient, serebiiScraper)
+	set, err := matchEmAll(nameToValues, pokeApiClient, serebiiScraper, graphQlClient)
 	if err != nil {
 		return nil, err
 	}
@@ -57,8 +59,9 @@ func matchEmAll(
 	nameToValues map[string][]string,
 	pokeApiClient api.PokeClient,
 	serebiiScraper scraper.SerebiiScraper,
+	graphQLClient graphql.PokeGraphQLClient,
 ) (PokemonSet, error) {
-	manager := newCharacteristicManager(pokeApiClient, serebiiScraper)
+	manager := newCharacteristicManager(pokeApiClient, serebiiScraper, graphQLClient)
 	pokemons := make(PokemonSet, 0)
 	for name, values := range nameToValues {
 		char, err := manager.createCharacteristic(name)

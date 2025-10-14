@@ -4,17 +4,21 @@ import (
 	"fmt"
 
 	"github.com/CarusoVitor/dokuex/api"
+	"github.com/CarusoVitor/dokuex/graphql"
 	"github.com/CarusoVitor/dokuex/scraper"
 )
 
 const (
-	typeName       string = "type"
-	generationName string = "generation"
-	moveName       string = "move"
-	abilityName    string = "ability"
-	ultraBeastName string = "ultra-beast"
-	megaName       string = "mega"
-	gmaxName       string = "gmax"
+	typeName        string = "type"
+	generationName  string = "generation"
+	moveName        string = "move"
+	abilityName     string = "ability"
+	ultraBeastName  string = "ultra-beast"
+	megaName        string = "mega"
+	gmaxName        string = "gmax"
+	isLegendaryName string = "legendary"
+	isBabyName      string = "baby"
+	isMythicalName  string = "mythical"
 )
 
 type InvalidCharacteristicError struct {
@@ -36,13 +40,19 @@ type characteristic interface {
 type characteristicManager struct {
 	pokeApiClient  api.PokeClient
 	serebiiScraper scraper.SerebiiScraper
+	graphQLClient  graphql.PokeGraphQLClient
 }
 
 func newCharacteristicManager(
 	pokeApiClient api.PokeClient,
 	serebiiScraper scraper.SerebiiScraper,
+	graphQLClient graphql.PokeGraphQLClient,
 ) *characteristicManager {
-	return &characteristicManager{pokeApiClient: pokeApiClient, serebiiScraper: serebiiScraper}
+	return &characteristicManager{
+		pokeApiClient:  pokeApiClient,
+		serebiiScraper: serebiiScraper,
+		graphQLClient:  graphQLClient,
+	}
 }
 
 func (cm *characteristicManager) createCharacteristic(name string) (characteristic, error) {
@@ -61,6 +71,13 @@ func (cm *characteristicManager) createCharacteristic(name string) (characterist
 		return newMegaCharacteristic(cm.serebiiScraper), nil
 	case gmaxName:
 		return newGmaxCharacteristic(cm.serebiiScraper), nil
+	case isLegendaryName:
+		return newIsLegendaryCharacteristic(cm.graphQLClient), nil
+	case isBabyName:
+		return newIsBabyCharacteristic(cm.graphQLClient), nil
+	case isMythicalName:
+		return newIsMythicalCharacteristic(cm.graphQLClient), nil
 	}
+
 	return nil, newInvalidCharacteristicsError(name)
 }
