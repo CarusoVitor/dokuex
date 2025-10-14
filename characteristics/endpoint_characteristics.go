@@ -7,7 +7,7 @@ import (
 )
 
 // endpointCharacteristic are the ones that query the api directly as
-// /characteristic_name/{characteristic}
+// /Characteristic_Name/{characteristic}
 type endpointCharacteristic struct {
 	name      string
 	client    api.PokeClient
@@ -24,7 +24,7 @@ func (ac endpointCharacteristic) getPokemons(value string) (PokemonSet, error) {
 
 func newTypeCharacteristic(client api.PokeClient) endpointCharacteristic {
 	return endpointCharacteristic{
-		name:      typeName,
+		name:      TypeName,
 		client:    client,
 		formatter: formatTypeResponse,
 	}
@@ -32,7 +32,7 @@ func newTypeCharacteristic(client api.PokeClient) endpointCharacteristic {
 
 func newGenerationCharacteristic(client api.PokeClient) endpointCharacteristic {
 	return endpointCharacteristic{
-		name:      generationName,
+		name:      GenerationName,
 		client:    client,
 		formatter: formatGenerationResponse,
 	}
@@ -40,7 +40,7 @@ func newGenerationCharacteristic(client api.PokeClient) endpointCharacteristic {
 
 func newMoveCharacteristic(client api.PokeClient) endpointCharacteristic {
 	return endpointCharacteristic{
-		name:      moveName,
+		name:      MoveName,
 		client:    client,
 		formatter: formatMoveResponse,
 	}
@@ -48,7 +48,7 @@ func newMoveCharacteristic(client api.PokeClient) endpointCharacteristic {
 
 func newAbilityCharacteristic(client api.PokeClient) endpointCharacteristic {
 	return endpointCharacteristic{
-		name:      abilityName,
+		name:      AbilityName,
 		client:    client,
 		formatter: formatAbilityResponse,
 	}

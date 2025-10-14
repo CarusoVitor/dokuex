@@ -9,7 +9,7 @@ type ultraBeastCharacteristic struct {
 }
 
 func (ubc ultraBeastCharacteristic) getPokemons(value string) (PokemonSet, error) {
-	raw, err := ubc.client.FetchPokemons(abilityName, ultraBeastAbility)
+	raw, err := ubc.client.FetchPokemons(AbilityName, ultraBeastAbility)
 	if err != nil {
 		return nil, err
 	}

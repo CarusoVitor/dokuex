@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/CarusoVitor/dokuex/characteristics"
 	"github.com/spf13/cobra"
 )
 
@@ -16,16 +17,16 @@ var rootCmd = &cobra.Command{
 }
 
 func init() {
-	matchCmd.Flags().StringSlice("type", []string{}, "Type of the pokemon")
-	matchCmd.Flags().String("generation", "", "Pokemon generation in generation-Z form, where Z is a roman numeral from 1 to 9")
-	matchCmd.Flags().StringSlice("move", []string{}, "Pokemon moves")
-	matchCmd.Flags().StringSlice("ability", []string{}, "Pokemon abilities (including hidden)")
-	matchCmd.Flags().Bool("ultra-beast", true, "Ultra beast pokemons")
-	matchCmd.Flags().Bool("mega", true, "Mega pokemons and their base forms")
-	matchCmd.Flags().Bool("gmax", true, "Gigantamax pokemons and their base forms")
-	matchCmd.Flags().Bool("legendary", true, "Legendary pokemons")
-	matchCmd.Flags().Bool("baby", true, "Baby pokemons")
-	matchCmd.Flags().Bool("mythical", true, "Mythical pokemons")
+	matchCmd.Flags().StringSlice(characteristics.TypeName, []string{}, "Type of the pokemon")
+	matchCmd.Flags().String(characteristics.GenerationName, "", "Pokemon generation in generation-Z form, where Z is a roman numeral from 1 to 9")
+	matchCmd.Flags().StringSlice(characteristics.MoveName, []string{}, "Pokemon moves")
+	matchCmd.Flags().StringSlice(characteristics.AbilityName, []string{}, "Pokemon abilities (including hidden)")
+	matchCmd.Flags().Bool(characteristics.UltraBeastName, true, "Ultra beast pokemons")
+	matchCmd.Flags().Bool(characteristics.MegaName, true, "Mega pokemons and their base forms")
+	matchCmd.Flags().Bool(characteristics.GmaxName, true, "Gigantamax pokemons and their base forms")
+	matchCmd.Flags().Bool(characteristics.LegendaryName, true, "Legendary pokemons")
+	matchCmd.Flags().Bool(characteristics.BabyName, true, "Baby pokemons")
+	matchCmd.Flags().Bool(characteristics.MythicalName, true, "Mythical pokemons")
 	rootCmd.AddCommand(matchCmd)
 }
 

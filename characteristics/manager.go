@@ -9,16 +9,16 @@ import (
 )
 
 const (
-	typeName        string = "type"
-	generationName  string = "generation"
-	moveName        string = "move"
-	abilityName     string = "ability"
-	ultraBeastName  string = "ultra-beast"
-	megaName        string = "mega"
-	gmaxName        string = "gmax"
-	isLegendaryName string = "legendary"
-	isBabyName      string = "baby"
-	isMythicalName  string = "mythical"
+	TypeName       string = "type"
+	GenerationName string = "generation"
+	MoveName       string = "move"
+	AbilityName    string = "ability"
+	UltraBeastName string = "ultra-beast"
+	MegaName       string = "mega"
+	GmaxName       string = "gmax"
+	LegendaryName  string = "legendary"
+	BabyName       string = "baby"
+	MythicalName   string = "mythical"
 )
 
 type InvalidCharacteristicError struct {
@@ -57,25 +57,25 @@ func newCharacteristicManager(
 
 func (cm *characteristicManager) createCharacteristic(name string) (characteristic, error) {
 	switch name {
-	case typeName:
+	case TypeName:
 		return newTypeCharacteristic(cm.pokeApiClient), nil
-	case generationName:
+	case GenerationName:
 		return newGenerationCharacteristic(cm.pokeApiClient), nil
-	case moveName:
+	case MoveName:
 		return newMoveCharacteristic(cm.pokeApiClient), nil
-	case abilityName:
+	case AbilityName:
 		return newAbilityCharacteristic(cm.pokeApiClient), nil
-	case ultraBeastName:
+	case UltraBeastName:
 		return newUltraBeastCharacteristic(cm.pokeApiClient), nil
-	case megaName:
+	case MegaName:
 		return newMegaCharacteristic(cm.serebiiScraper), nil
-	case gmaxName:
+	case GmaxName:
 		return newGmaxCharacteristic(cm.serebiiScraper), nil
-	case isLegendaryName:
+	case LegendaryName:
 		return newIsLegendaryCharacteristic(cm.graphQLClient), nil
-	case isBabyName:
+	case BabyName:
 		return newIsBabyCharacteristic(cm.graphQLClient), nil
-	case isMythicalName:
+	case MythicalName:
 		return newIsMythicalCharacteristic(cm.graphQLClient), nil
 	}
 

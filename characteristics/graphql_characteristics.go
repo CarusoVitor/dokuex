@@ -53,13 +53,13 @@ func formatPokemonSpeciesResponse(raw []byte) (PokemonSet, error) {
 }
 
 func newIsLegendaryCharacteristic(client graphql.PokeGraphQLClient) graphqlCharacteristic {
-	return newGraphQLCharacteristic(isLegendaryName, client, formatPokemonSpeciesResponse)
+	return newGraphQLCharacteristic(LegendaryName, client, formatPokemonSpeciesResponse)
 }
 
 func newIsBabyCharacteristic(client graphql.PokeGraphQLClient) graphqlCharacteristic {
-	return newGraphQLCharacteristic(isBabyName, client, formatPokemonSpeciesResponse)
+	return newGraphQLCharacteristic(BabyName, client, formatPokemonSpeciesResponse)
 }
 
 func newIsMythicalCharacteristic(client graphql.PokeGraphQLClient) graphqlCharacteristic {
-	return newGraphQLCharacteristic(isMythicalName, client, formatPokemonSpeciesResponse)
+	return newGraphQLCharacteristic(MythicalName, client, formatPokemonSpeciesResponse)
 }
